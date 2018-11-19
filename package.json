@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "giojs": "^2.0.0"
+    "evernote": "^2.0.5",
+    "feedparser": "^2.2.9",
+    "giojs": "^2.0.0",
+    "oauth": "^0.9.15",
+    "request": "^2.88.0",
+    "websocket": "^1.0.28"
   }
 }

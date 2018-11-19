@@ -1,0 +1,20 @@
+<script src="http://yourdomain/jquery.js" type="text/javascript"></script>
+<script src="http://yourdomain/jquery.jfeed.pack.js" type="text/javascript"></script>
+<script type="text/javascript">
+jQuery(function() {
+jQuery.getFeed({
+url: 'proxy.php?url=フィードURI', //proxy.phpはダウンロードしたファイルのもの
+success: function(feed) {
+jQuery('#id名').append('<a href="' + feed.link + '">' + feed.title + '</a>'); //フィードのタイトル
+var html = '';
+for(var i = 0; i < feed.items.length && i < 10; i++) { //数字は件数
+var item = feed.items[i];
+html += '<a href="' + item.link + '">' + item.title + '</a>'; //記事のタイトル
+html += item.updated //更新時間
+html += item.description;　//内容
+}
+jQuery('#id名').append(html);
+} 
+});
+});
+</script>

@@ -1,7 +1,13 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const serviceAccount = require('../service_account/kindle-7ef16-firebase-adminsdk-ksy3r-3fde325273.json');
 const settings = {timestampsInSnapshots: true};
+
+let serviceAccount;
+if (process.env.NODE_ENV === 'test') {
+  serviceAccount = require('./service_account/kindle-7ef16-firebase-adminsdk-ksy3r-3fde325273.json');
+} else {
+  serviceAccount = functions.config().account.cert;
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
