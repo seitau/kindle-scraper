@@ -45,6 +45,14 @@ const langs = {
 
 const EnglishClient = new WebSocketClient();
 const JapaneseClient = new WebSocketClient();
+var frequencies = {}
+for(let lang in langs) {
+  Object.defineProperty(frequencies, lang, {
+    value: 0,
+    writable: true
+  });
+}
+console.log(frequencies)
 
 function connectWebsocket(client, lang) {
   client.on('connectFailed', function(error) {
@@ -63,6 +71,7 @@ function connectWebsocket(client, lang) {
       if (message.type === 'utf8') {
         // console.log("Received: '" + message.utf8Data + "'");
         console.log("Get message in " + lang);
+        frequencies[lang]++
       }
     });
 
@@ -79,5 +88,16 @@ function connectWebsocket(client, lang) {
   client.connect(langs[lang][1], null);
 }
 
+
 connectWebsocket(EnglishClient, 'en');
 connectWebsocket(JapaneseClient, 'ja');
+
+function getModificationFrequency(lang) {
+  console.log(frequencies[lang])
+  return frequencies[lang]
+}
+
+//setInterval(function() {
+//  getModificationFrequency('en');
+//  getModificationFrequency('ja');
+//}, 5000);
