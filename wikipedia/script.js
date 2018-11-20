@@ -1,5 +1,3 @@
-//const WebSocketClient = require('websocket').client;
-
 const langs = {
   'en': ['English', 'ws://wikimon.hatnote.com:9000'],
   'de': ['German', 'ws://wikimon.hatnote.com:9010'],
@@ -43,72 +41,41 @@ const langs = {
   'wikidata': ['Wikidata' , 'ws://wikimon.hatnote.com:9220']
 }
 
-const socket = new WebSocket('ws://localhost:8080');
+var modificationCount = {}
+for(let lang in langs) {
+  Object.defineProperty(modificationCount, lang, {
+    value: 0,
+    writable: true
+  });
+}
 
-// Connection opened
-socket.addEventListener('open', function (event) {
+export var modCount = modificationCount
+
+export function subscribe(lang, count) {
+  const socket = new WebSocket(langs[lang][1]);
+
+  // Connection opened
+  socket.addEventListener('open', function (event) {
     socket.send('Hello Server!');
-});
+  });
 
-// Listen for messages
-socket.addEventListener('message', function (event) {
-    console.log('Message from server ', event.data);
-});
+  // Listen for messages
+  socket.addEventListener('message', function (event) {
+    //console.log('Message from server in ' + lang + ': ' + event.data);
+    count[lang]++
+  });
+}
 
-//const EnglishClient = new WebSocketClient();
-//const JapaneseClient = new WebSocketClient();
-//var frequencies = {}
-//for(let lang in langs) {
-//  Object.defineProperty(frequencies, lang, {
-//    value: 0,
-//    writable: true
-//  });
-//}
-//console.log(frequencies)
-//
-//function connectWebsocket(client, lang) {
-//  client.on('connectFailed', function(error) {
-//    console.log('Connect Error: ' + error.toString());
-//  });
-//
-//  client.on('connect', function(connection) {
-//    console.log('WebSocket Client Connected: ' + lang);
-//    connection.on('error', function(error) {
-//      console.log("Connection Error: " + error.toString());
-//    });
-//    connection.on('close', function() {
-//      console.log('echo-protocol Connection Closed');
-//    });
-//    connection.on('message', function(message) {
-//      if (message.type === 'utf8') {
-//        // console.log("Received: '" + message.utf8Data + "'");
-//        console.log("Get message in " + lang);
-//        frequencies[lang]++
-//      }
-//    });
-//
-//    function sendNumber() {
-//      if (connection.connected) {
-//        var number = Math.round(Math.random() * 0xFFFFFF);
-//        connection.sendUTF(number.toString());
-//        setTimeout(sendNumber, 1000);
-//      }
-//    }
-//    sendNumber();
-//  });
-//
-//  client.connect(langs[lang][1], null);
-//}
-//
-//module.exports = function getModificationFrequency(lang) {
-//  connectWebsocket(EnglishClient, 'en');
-//  connectWebsocket(JapaneseClient, 'ja');
-//
-//  console.log(frequencies[lang])
-//  return frequencies[lang]
-//}
+export function getModificationCount(lang) {
+  subscribe(lang);
+
+  console.log(modificationCount[lang])
+  return modificationCount[lang]
+}
 
 //setInterval(function() {
 //  getModificationFrequency('en');
 //  getModificationFrequency('ja');
 //}, 5000);
+//
+

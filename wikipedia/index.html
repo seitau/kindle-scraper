@@ -4,7 +4,6 @@
     <title>Pie Chart</title>
     <script src="../node_modules/chart.js/dist/Chart.bundle.js"></script>
     <script src="utils.js"></script>
-    <script src="bundle.js"></script>
   </head>
 
   <body>
@@ -15,6 +14,7 @@
     <button id="addDataset">Add Dataset</button>
     <button id="removeDataset">Remove Dataset</button>
     <script type="module"> 
+      import { modCount, subscribe, getModificationCount } from './script.js';
       var randomScalingFactor = function() {
         return Math.round(Math.random() * 100);
       };
@@ -29,32 +29,50 @@
       //   grey: 'rgb(201, 203, 207)'
       // };
 
+      subscribe('en', modCount);
+      subscribe('ja', modCount);
+      subscribe('ru', modCount);
+      subscribe('es', modCount);
+      subscribe('zh', modCount);
+      subscribe('fr', modCount);
+      subscribe('ar', modCount);
+      subscribe('wikidata', modCount);
+
       var config = {
         type: 'pie',
         data: {
           datasets: [{
             data: [
-              getModificationFrequency('en'),
-              getModificationFrequency('ja'),
-              //randomScalingFactor(),
-              //randomScalingFactor(),
-              //randomScalingFactor(),
+              modCount['en'],
+              modCount['ja'],
+              modCount['ru'],
+              modCount['es'],
+              modCount['zh'],
+              modCount['fr'],
+              modCount['ar'],
+              modCount['wikidata'],
             ],
             backgroundColor: [
               window.chartColors.red,
               window.chartColors.orange,
-              //window.chartColors.yellow,
-              //window.chartColors.green,
-              //window.chartColors.blue,
+              window.chartColors.yellow,
+              window.chartColors.green,
+              window.chartColors.blue,
+              window.chartColors.purple,
+              window.chartColors.grey,
+              'rgb(100, 203, 207)'
             ],
-            label: 'Dataset 1'
+            label: 'World Languages'
           }],
           labels: [
-            'Red',
-            'Orange',
-            //'Yellow',
-            //'Green',
-            //'Blue'
+            'English',
+            'Japanese',
+            'Russian',
+            'Spanish',
+            'Chinese',
+            'French',
+            'Arabic',
+            'Wikidata',
           ]
         },
         options: {
@@ -64,6 +82,21 @@
       window.onload = function() {
         var ctx = document.getElementById('chart-area').getContext('2d');
         window.myPie = new Chart(ctx, config);
+
+        setInterval(function() {
+          config.data.datasets[0].data = [
+              modCount['en'],
+              modCount['ja'],
+              modCount['ru'],
+              modCount['es'],
+              modCount['zh'],
+              modCount['fr'],
+              modCount['ar'],
+              modCount['wikidata'],
+          ];
+          window.myPie.update();
+          console.log(modCount)
+        }, 3000)
       };
       document.getElementById('randomizeData').addEventListener('click', function() {
         config.data.datasets.forEach(function(dataset) {
