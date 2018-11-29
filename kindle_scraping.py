@@ -59,9 +59,12 @@ for c in contents:
     c.click()
     time.sleep(2.5)
 
-    annotations = driver.find_element_by_id("kp-notebook-annotations")
-    yellow_highlights = annotations.find_elements_by_xpath("//div/div/div/div/div[contains(@class, 'kp-notebook-highlight-yellow')]/span[@id='highlight']") 
-    blue_highlights = annotations.find_elements_by_xpath("//div/div/div/div/div[contains(@class, 'kp-notebook-highlight-blue')]/span[@id='highlight']") 
+    try:
+        annotations = driver.find_element_by_id("kp-notebook-annotations")
+        yellow_highlights = annotations.find_elements_by_xpath("//div/div/div/div/div[contains(@class, 'kp-notebook-highlight-yellow')]/span[@id='highlight']") 
+        blue_highlights = annotations.find_elements_by_xpath("//div/div/div/div/div[contains(@class, 'kp-notebook-highlight-blue')]/span[@id='highlight']") 
+    except:
+        continue
 
     dataStoredInFireStore = []
 
