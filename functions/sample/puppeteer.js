@@ -11,7 +11,6 @@ const pc = {
     }
 };
 const iPad = devices['iPad Pro'];
-
 const cookies_path = './cookies_amazon.json';
 const AMAZON_EMAIL = process.env.AMAZON_EMAIL;
 const AMAZON_PASSWORD = process.env.AMAZON_PASSWORD;
@@ -36,9 +35,14 @@ async function restoreCookie(page) {
     }
 }
 
+async function saveCookie(page) {
+    const cookies = await page.cookies();
+    fs.writeFileSync('cookies_amazon.json', JSON.stringify(cookies));
+}
+
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
     });
 
     const page = await browser.newPage();
@@ -60,22 +64,27 @@ async function restoreCookie(page) {
     await page.goto(amazon_kindle_url);
     await page.waitFor(2000);
 
-    const covers = await page.$$(".kp-notebook-library-each-book");
-    console.log(covers.length)
-    for(const cover of covers) {
-        await cover.click();
-        await page.waitFor(500);
-    }
+    const books = await page.$$('div.kp-notebook-library-each-book');
+    console.log('Book number: ' + books.length);
 
-    //let covers = await page.$$("//div/span/a/h2[contains(@class, 'kp-noteb    ook-searchable')]");
-    //covers.forEach(async (cover) => {
-        //console.log(cover.name())
-        ////await cover.click();
-        //await page.waitFor(2000);
-    //});
-    
-    //let properties = await covers[2].getProperties();
-    //console.log(properties);
+    for(const book of books) {
+        const src = await book.$eval('.kp-notebook-cover-image', (img) =>  {
+            return img.getAttribute('src');
+        });
+        console.log(src);
+        await book.click()
+        await page.waitFor(1000);
+
+        const annotations = await page.$$eval('#highlight', (hls) => {
+            return hls.map((hl) => hl.textContent)
+        });
+        //console.log(annotations)
+
+        const title = await book.$eval('.kp-notebook-searchable', (e) => {
+            return e.textContent;
+        });
+        //console.log(title);
+    }
 
     //const frames = await page.frames();
     //const kindleLibraryIFrame = frames.find(f => f.name() === 'KindleLibraryIFrame' );
@@ -100,11 +109,9 @@ async function restoreCookie(page) {
     //});
     //console.log(commission);
 
-    await page.waitFor(2000);
     console.log('Taking screenshot ...');
     await page.screenshot({path: 'images/amazon_after.png'});
-    const afterCookies = await page.cookies();
-    fs.writeFileSync('cookies_amazon.json', JSON.stringify(afterCookies));
+    await saveCookie(page);
 
     browser.close();
 })();

@@ -2,15 +2,16 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "serve": "NODE_ENV=test && firebase serve --only functions",
+    "serve": "sh serve.sh",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "firebase-admin": "~6.0.0",
+    "firebase-admin": "^6.5.1",
     "firebase-functions": "^2.1.0",
+    "ogp-parser": "^0.4.1",
     "puppeteer": "^1.11.0"
   },
   "private": true
