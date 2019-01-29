@@ -1,13 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const settings = {timestampsInSnapshots: true};
-
-let serviceAccount;
-if (process.env.NODE_ENV === 'test') {
-    serviceAccount = require('./service_account/kindle-7ef16-firebase-adminsdk-ksy3r-3fde325273.json');
-} else {
-    serviceAccount = functions.config().account.cert;
-}
+const serviceAccount = functions.config().account.cert;
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -49,7 +43,7 @@ exports.ogp = functions.https.onRequest((req, res) => {
             console.log(ogpData);
             return res.set('Cache-Control', chacheControl).json(ogpData);
         })
-        .catch((error) => {
+        .catch((err) => {
             console.error(err);
             return res.json({ error: "Error getting ogp data:" + err });
         });
