@@ -1,20 +1,11 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const settings = {timestampsInSnapshots: true};
-const serviceAccount = functions.config().account.cert;
+const firebase = require('./common/firebase.js');
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
-admin.firestore().settings(settings);
-const db = admin.firestore()
-
-exports.evernoteAuth = functions.https.onRequest((req, res) => {
+exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
     const params = req.query;
     if (!params.hasOwnProperty('oauth_token')) {
         params['oauth_token'] = 'not provided';
     }
-    return db.collection('auth').doc('evernote')
+    return firebase.db.collection('auth').doc('evernote')
         .update({
             oauth_token: params['oauth_token'],
             oauth_verifier: params['oauth_verifier'],
@@ -30,7 +21,7 @@ exports.evernoteAuth = functions.https.onRequest((req, res) => {
         });
 });
 
-exports.ogp = functions.https.onRequest((req, res) => {
+exports.ogp = firebase.functions.https.onRequest((req, res) => {
     const parser = require("ogp-parser");
     const params = req.query;
     const chacheControl = 'public, max-age=31557600, s-maxage=31557600';

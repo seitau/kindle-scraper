@@ -9,6 +9,8 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
+    "dotenv": "^6.2.0",
+    "dotenv-json": "^1.0.0",
     "firebase-admin": "^6.5.1",
     "firebase-functions": "^2.1.0",
     "ogp-parser": "^0.4.1",

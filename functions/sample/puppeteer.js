@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const devices = require('puppeteer/DeviceDescriptors');
 const fs = require('fs');
+const firebase = require('../common/firebase.js');
 
 const pc = {
     name: 'Desktop 1920x1080',
@@ -11,17 +12,25 @@ const pc = {
     }
 };
 const iPad = devices['iPad Pro'];
-const cookies_path = './cookies_amazon.json';
+const cookiesPath = './cookies_amazon.json';
 const AMAZON_EMAIL = process.env.AMAZON_EMAIL;
 const AMAZON_PASSWORD = process.env.AMAZON_PASSWORD;
-const amazon_kindle_url = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
+const amazonKindleUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
 
 async function login(page) {
     await page.waitFor(2000);
 
     await page.screenshot({path: 'images/amazon_loggingin.png'});
-    await page.type('#ap_password', AMAZON_PASSWORD);
-    await page.type('#ap_email', AMAZON_EMAIL);
+
+    const password_input = await page.$('#ap_password');
+    if(password_input !== null) {
+        await page.type('#ap_password', AMAZON_PASSWORD);
+    }
+
+    const email_input = await page.$('#ap_email');
+    if(email_input !== null) {
+        await page.type('#ap_email', AMAZON_EMAIL);
+    }
 
     await page.click('#signInSubmit');
     await page.waitFor(5000);
@@ -29,7 +38,7 @@ async function login(page) {
 }
 
 async function restoreCookie(page) {
-    const cookies = JSON.parse(fs.readFileSync(cookies_path, 'utf-8'));
+    const cookies = JSON.parse(fs.readFileSync(cookiesPath, 'utf-8'));
     for (let cookie of cookies) {
         await page.setCookie(cookie);
     }
@@ -39,6 +48,41 @@ async function saveCookie(page) {
     const cookies = await page.cookies();
     fs.writeFileSync('cookies_amazon.json', JSON.stringify(cookies));
 }
+
+async function scrapeBook(book, page, bookId) {
+    const title = await book.$eval('.kp-notebook-searchable', (e) => {
+        return e.textContent;
+    });
+    const src = await book.$eval('.kp-notebook-cover-image', (img) =>  {
+        return img.getAttribute('src');
+    });
+    const newPage = page;
+    await newPage.click(`#` + bookId)
+    await newPage.waitForSelector('.kp-notebook-annotation-container');
+
+    const yellowHighlights = await newPage.$$('.kp-notebook-highlight-yellow');
+    const blueHighlights = await newPage.$$('.kp-notebook-highlight-blue');
+
+    const yellowAnnotations = (await Promise.all(yellowHighlights.map((yellowHl) => {
+        return yellowHl.$eval('#highlight', (span) => span.textContent)
+            .then((text) => text)
+            .catch((err) => undefined);
+    }))).filter((e) => e !== undefined);
+
+    const blueAnnotations = (await Promise.all(blueHighlights.map((blueHl) => {
+        return blueHl.$eval('#highlight', (span) => span.textContent)
+            .then((text) => text)
+            .catch((err) => undefined);
+    }))).filter((e) => e !== undefined);
+
+    return {
+        title: title,
+        image: src,
+        yellowAnnotations: yellowAnnotations,
+        blueAnnotations: blueAnnotations,
+    };
+}
+
 
 (async () => {
     const browser = await puppeteer.launch({
@@ -54,60 +98,40 @@ async function saveCookie(page) {
     console.log('Restoring cookie');
     await restoreCookie(page);
 
-    browser.on('targetcreated', target => {
-        const kindle_notebook_library = target.url();
-        console.log('Going to ' + kindle_notebook_library);
-        page.goto(kindle_notebook_library);
-    });
-
     console.log('Opening amazon kindle website');
-    await page.goto(amazon_kindle_url);
-    await page.waitFor(2000);
+    await page.goto(amazonKindleUrl, {waitUntil: 'load'});
+    //await page.waitFor(2000);
 
-    const books = await page.$$('div.kp-notebook-library-each-book');
-    console.log('Book number: ' + books.length);
-
-    for(const book of books) {
-        const src = await book.$eval('.kp-notebook-cover-image', (img) =>  {
-            return img.getAttribute('src');
-        });
-        console.log(src);
-        await book.click()
-        await page.waitFor(1000);
-
-        const annotations = await page.$$eval('#highlight', (hls) => {
-            return hls.map((hl) => hl.textContent)
-        });
-        //console.log(annotations)
-
-        const title = await book.$eval('.kp-notebook-searchable', (e) => {
-            return e.textContent;
-        });
-        //console.log(title);
+    const password_input = await page.$('#ap_password');
+    if(password_input !== null) {
+        console.log('Opening amazon kindle website');
+        await login(page);
     }
 
-    //const frames = await page.frames();
-    //const kindleLibraryIFrame = frames.find(f => f.name() === 'KindleLibraryIFrame' );
+    const eachBookSelector = 'div.kp-notebook-library-each-book';
+    await page.waitForSelector(eachBookSelector);
+    const books = await page.$$(eachBookSelector);
+    const booksIds = await page.$$eval(eachBookSelector, list => {
+        return list.map((data) => data.id);
+    });
+    console.log('Book number: ' + books.length);
 
-    //await kindleLibraryIFrame.$('#kindle_dialog_firstRun_button').then(frame => {
-        //return frame.click();
-    //});
-    //await kindleLibraryIFrame.$('#kindleLibrary_button_notebook').then(frame => {
-        //return frame.click();
-    //});
-    //await page.waitFor(3000);
+    let newPages = new Array();
+    for (let i = 0; i < 2; i++) {
+        const newPage = await browser.newPage();
+        await newPage.goto(amazonKindleUrl);
+        newPages.push(newPage)
+    }
+    newPages.push(page);
 
-    //console.log('Logging in ...');
-    //await login(page);
-    //console.log('Logging in done ...');
-    //await page.goto('https://affiliate.amazon.co.jp/home');
-    //await page.screenshot({path: 'images/amazon_login.png'});
+    for (const [index, book] of books.entries()) {
+        try {
+            console.log(await scrapeBook(book, newPages[index%3], booksIds[index]))
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    //await page.goto('https://affiliate.amazon.co.jp/home/reports?ac-ms-src=summaryforthismonth');
-    //const commission = await page.evaluate(() => {
-    //return document.querySelector('#ac-report-commission-commision-total').textContent;
-    //});
-    //console.log(commission);
 
     console.log('Taking screenshot ...');
     await page.screenshot({path: 'images/amazon_after.png'});
