@@ -117,7 +117,8 @@ async function scrapeBook(book, page, bookId) {
     console.log('Book number: ' + books.length);
 
     let newPages = new Array();
-    for (let i = 0; i < 2; i++) {
+    let pageNum = 2;
+    for (let i = 0; i < pageNum; i++) {
         const newPage = await browser.newPage();
         await newPage.goto(amazonKindleUrl);
         newPages.push(newPage)
@@ -126,12 +127,11 @@ async function scrapeBook(book, page, bookId) {
 
     for (const [index, book] of books.entries()) {
         try {
-            console.log(await scrapeBook(book, newPages[index%3], booksIds[index]))
+            console.log(await scrapeBook(book, newPages[index%newPages.length], booksIds[index]))
         } catch (err) {
             console.error(err);
         }
     };
-
 
     console.log('Taking screenshot ...');
     await page.screenshot({path: 'images/amazon_after.png'});
