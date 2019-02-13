@@ -1,4 +1,4 @@
-import * as firebase from '../common/firebase.js';
+import * as firebase from './common/firebase.js';
 
 exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
     const params = req.query;
@@ -39,3 +39,33 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
             return res.json({ error: "Error getting ogp data:" + err });
         });
 });
+
+exports.scrapeKindle = firebase.functions.https.onRequest(async (req, res) => {
+    if (req.get('content-type') !== 'application/json') {
+        console.error("Error scraping kindle: request has to be application/json format");
+        return res.json({ error: "Error scraping kindle: request has to be application/json format" });
+
+    } else if (req.method !== "POST") {
+        console.error("Error scraping kindle: request has to be post method");
+        return res.json({ error: "Error scraping kindle: request has to be post method" });
+
+    }
+    const KindleScraper = require("../common/kindle-scraper.ts");
+    const puppeteer = require('puppeteer');
+    const body = req.body;
+    if (!body.hasOwnProperty('email') || !body.hasOwnProperty('password')) {
+        console.error("Error scraping kindle: please provide email and password");
+        return res.json({ error: "Error scraping kindle: please provide email and password" });
+    }
+    const browser = await puppeteer.launch({
+        headless: true,
+    });
+    const page = await browser.newPage()
+    const scraper = new KindleScraper(browser, page, body.email, body.password);
+    return await scraper.scrapeKindle()
+        .catch((err) => {
+            console.error(err);
+            return res.json({ error: "Error scraping kindle: " + err });
+        });
+});
+
