@@ -1,4 +1,4 @@
-const firebase = require('./common/firebase.js');
+import * as firebase from '../common/firebase.js';
 
 exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
     const params = req.query;
@@ -16,8 +16,8 @@ exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
             return res.send("Evernote auth successfully executed");
         })
         .catch((err) => {
-            console.error("Error adding document: ", err);
-            return res.send("Error adding document: ", err);
+            console.error("Error adding document: " + err);
+            return res.send("Error adding document: " + err);
         });
 });
 
@@ -39,4 +39,3 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
             return res.json({ error: "Error getting ogp data:" + err });
         });
 });
-
