@@ -2,6 +2,9 @@
     "name": "functions",
     "description": "Cloud Functions for Firebase",
     "main": "lib/index.js",
+    "engines": {
+        "node": "8"
+    },
     "scripts": {
         "serve": "sh serve.sh",
         "shell": "firebase functions:shell",
@@ -17,7 +20,7 @@
         "firebase-admin": "^6.5.1",
         "firebase-functions": "^2.1.0",
         "ogp-parser": "^0.4.1",
-        "puppeteer": "^1.11.0",
+        "puppeteer": "^1.12.2",
         "tslint": "^5.12.1",
         "typescript": "^3.3.3"
     },
