@@ -1,4 +1,6 @@
 #!/bin/bash -xeu
+set -e -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 removeRuntimeConfig(){
     rm .runtimeconfig.json;

@@ -13,11 +13,11 @@ exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
         })
         .then(() => {
             console.log("Document written!: ", req.query);
-            return res.send("Evernote auth successfully executed");
+            return res.status(200).send("Evernote auth successfully executed");
         })
         .catch((err) => {
             console.error("Error adding document: " + err);
-            return res.send("Error adding document: " + err);
+            return res.status(500).send("Error adding document: " + err);
         });
 });
 
@@ -27,7 +27,7 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
     const chacheControl = 'public, max-age=31557600, s-maxage=31557600';
     if (!params.hasOwnProperty('url')) {
         console.error("Error getting ogp data: please provide url");
-        return res.json({ error: "Error getting ogp data: please provide url" });
+        return res.status(400).json({ error: "Error getting ogp data: please provide url" });
     }
     return parser(encodeURI(params['url']), false)
         .then((data) => {
@@ -35,7 +35,7 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
             console.log(params['url']);
             if (!data.hasOwnProperty('title')) {
                 console.error("Error getting ogp data: no ogpData returned");
-                return res.json({ error: "no ogpData returned" });
+                return res.status(500).json({ error: "no ogpData returned" });
             }
             const ogpData = {};
             ogpData['siteName'] = data.title;
@@ -44,41 +44,45 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
                     ogpData[prop.split(':')[1]] = data.ogp[prop][0];
                 }
             }
-            return res.set('Cache-Control', chacheControl).json(ogpData);
+            return res.status(200).set('Cache-Control', chacheControl).json(ogpData);
         })
         .catch((err) => {
             console.error("Error getting ogp data: " + err);
-            return res.json({ error: err });
+            return res.status(500).json({ error: err });
         });
 });
 
 exports.scrapeKindle = firebase.functions.https.onRequest(async (req, res) => {
-    console.log(req.get('content-type'));
-    if (req.get('content-type') !== 'application/json') {
+    if (!/application\/json/g.test(req.get('content-type'))) {
         console.error("Error scraping kindle: request has to be application/json format");
-        return res.json({ error: "Error scraping kindle: request has to be application/json format" });
+        return res.status(400).json({ error: "Error scraping kindle: request has to be application/json format" });
 
     } else if (req.method !== "POST") {
         console.error("Error scraping kindle: request has to be post method");
-        return res.json({ error: "Error scraping kindle: request has to be post method" });
+        return res.status(400).json({ error: "Error scraping kindle: request has to be post method" });
 
     }
-    const KindleScraper = require("../common/kindle-scraper.ts");
+
+    const KindleScraper = require('./common/kindle-scraper').default;
     const puppeteer = require('puppeteer');
     const body = req.body;
     if (!body.hasOwnProperty('email') || !body.hasOwnProperty('password')) {
         console.error("Error scraping kindle: please provide email and password");
-        return res.json({ error: "Error scraping kindle: please provide email and password" });
+        return res.status(400).json({ error: "Error scraping kindle: please provide email and password" });
     }
     const browser = await puppeteer.launch({
         headless: true,
     });
     const page = await browser.newPage()
     const scraper = new KindleScraper(browser, page, body.email, body.password);
-    return await scraper.scrapeKindle()
+    await scraper.scrapeKindle()
         .catch((err) => {
             console.error(err);
-            return res.json({ error: "Error scraping kindle: " + err });
+            return res.status(500).json({ error: "Error scraping kindle: " + err });
         });
+    return res.status(200).json({
+        result: "Successfully scraped kindle",
+
+    });
 });
 

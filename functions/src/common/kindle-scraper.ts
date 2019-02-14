@@ -1,4 +1,4 @@
-const firebase = require('./firebase.js');
+import firebase from './firebase';
 const AMAZON_EMAIL = process.env.AMAZON_EMAIL;
 const AMAZON_PASSWORD = process.env.AMAZON_PASSWORD;
 const amazonKindleUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
@@ -11,7 +11,7 @@ const pc = {
     }
 };
 
-class KindleScraper {
+export default class {
     browser: any;
     page: any;
     pages: any;
@@ -63,7 +63,7 @@ class KindleScraper {
 
     async restoreCookies() {
         const docRef = await firebase.db.collection('cookies').doc('amazon');
-        const amazonCookiesDoc = await docRef.get()
+        const amazonCookiesDoc: any = await docRef.get()
             .catch((err) => console.error(err));
         if (!amazonCookiesDoc.exists) {
             console.error('amazon cookies does not exist');
@@ -229,5 +229,3 @@ class KindleScraper {
         return 
     }
 }
-
-export default KindleScraper;
