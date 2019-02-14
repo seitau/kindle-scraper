@@ -53,7 +53,11 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
 });
 
 exports.scrapeKindle = firebase.functions
-    .runWith({ memory: '1GB' }).https.onRequest(async (req, res) => {
+    .runWith({
+        timeoutSeconds: 200,
+        memory: '1GB'
+    })
+    .https.onRequest(async (req, res) => {
         if (!/application\/json/g.test(req.get('content-type'))) {
             console.error("Error scraping kindle: request has to be application/json format");
             return res.status(400).json({ error: "Error scraping kindle: request has to be application/json format" });
@@ -71,12 +75,16 @@ exports.scrapeKindle = firebase.functions
             console.error("Error scraping kindle: please provide email and password");
             return res.status(400).json({ error: "Error scraping kindle: please provide email and password" });
         }
+        const options = new Object();
+        if (body.hasOwnProperty('scrapeAll')) {
+            options['scrapeAll'] = body.scrapeAll;
+        };
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
-        const page = await browser.newPage()
-        const scraper = new KindleScraper(browser, page, body.email, body.password);
+        const page = await browser.newPage();
+        const scraper = new KindleScraper(browser, page, body.email, body.password, options);
         await scraper.scrapeKindle()
             .catch((err) => {
                 console.error(err);

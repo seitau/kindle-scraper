@@ -17,15 +17,28 @@ export default class {
     pages: any;
     amazonEmail: any;
     amazonPassword: any;
+    scrapeAll: any;
     additionalPageNum: any;
 
-    constructor(browser, page, amazonEmail, amazonPassword, additionalPageNum = 2) {
+    constructor(browser, page, amazonEmail, amazonPassword, options: any = {}) {
         this.browser = browser
         this.page = page;
         this.pages = new Array();
         this.amazonEmail = amazonEmail;
         this.amazonPassword = amazonPassword;
-        this.additionalPageNum = additionalPageNum;
+        this.scrapeAll = false;
+        this.additionalPageNum = 2;
+
+        if(options.hasOwnProperty('scrapeAll')) {
+            if(options.scrapeAll !== undefined) {
+                this.scrapeAll = options.scrapeAll;
+            }
+        }
+        if(options.hasOwnProperty('additionalPageNum')) {
+            if(options.additionalPageNum !== undefined) {
+                this.additionalPageNum = options.additionalPageNum;
+            }
+        }
     }
 
     async setUpEnvironment() {
@@ -155,12 +168,15 @@ export default class {
         const eachBookSelector = 'div.kp-notebook-library-each-book';
         await page.waitForSelector(eachBookSelector);
         const bookList = await page.$$(eachBookSelector);
-        const books = new Array();
+        let books = new Array();
         for(const book of bookList) {
             books.push({
                 id: await (await book.getProperty('id')).jsonValue(),
                 element: book,
             });
+        }
+        if (!this.scrapeAll) {
+            books = books.slice(0, 10);
         }
         console.log('Book number: ' + books.length);
 
