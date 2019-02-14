@@ -1,4 +1,4 @@
-import * as firebase from './common/firebase.js';
+import firebase from './common/firebase';
 
 exports.evernoteAuth = firebase.functions.https.onRequest((req, res) => {
     const params = req.query;
@@ -29,18 +29,31 @@ exports.ogp = firebase.functions.https.onRequest((req, res) => {
         console.error("Error getting ogp data: please provide url");
         return res.json({ error: "Error getting ogp data: please provide url" });
     }
-    return parser(params['url'], false)
-        .then((ogpData) => {
-            console.log(ogpData);
+    return parser(encodeURI(params['url']), false)
+        .then((data) => {
+            console.log(data);
+            console.log(params['url']);
+            if (!data.hasOwnProperty('title')) {
+                console.error("Error getting ogp data: no ogpData returned");
+                return res.json({ error: "no ogpData returned" });
+            }
+            const ogpData = {};
+            ogpData['siteName'] = data.title;
+            for(const prop in data.ogp) {
+                if (/^og:/g.test(prop)) {
+                    ogpData[prop.split(':')[1]] = data.ogp[prop][0];
+                }
+            }
             return res.set('Cache-Control', chacheControl).json(ogpData);
         })
         .catch((err) => {
-            console.error(err);
-            return res.json({ error: "Error getting ogp data:" + err });
+            console.error("Error getting ogp data: " + err);
+            return res.json({ error: err });
         });
 });
 
 exports.scrapeKindle = firebase.functions.https.onRequest(async (req, res) => {
+    console.log(req.get('content-type'));
     if (req.get('content-type') !== 'application/json') {
         console.error("Error scraping kindle: request has to be application/json format");
         return res.json({ error: "Error scraping kindle: request has to be application/json format" });

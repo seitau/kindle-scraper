@@ -1,7 +1,7 @@
 {
     "name": "functions",
     "description": "Cloud Functions for Firebase",
-    "main": "lib/src/index.js",
+    "main": "lib/index.js",
     "scripts": {
         "serve": "sh serve.sh",
         "shell": "firebase functions:shell",
