@@ -73,6 +73,7 @@ exports.scrapeKindle = firebase.functions
         }
         const browser = await puppeteer.launch({
             headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage()
         const scraper = new KindleScraper(browser, page, body.email, body.password);
