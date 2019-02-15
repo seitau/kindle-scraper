@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { sha256 } from 'js-sha256';
 const settings = {timestampsInSnapshots: true};
 
 let serviceAccount;

@@ -1,0 +1,42 @@
+/* ------------------------------
+   loopSlider
+------------------------------ */
+.loopSliderWrap {
+    top: 0;
+    left: 0;
+    height: 100px;
+    overflow: hidden;
+    position: absolute;
+}
+ 
+.loopSlider {
+    margin: 0 auto;
+    width: 500px;
+    height: 100px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+ 
+.loopSlider ul {
+    height: 100px;
+    float: left;
+    overflow: hidden;
+}
+ 
+.loopSlider ul li {
+    width: 100px;
+    height: 100px;
+    float: left;
+    display: inline;
+    overflow: hidden;
+}
+ 
+/* ------------------------------
+   CLEARFIX ELEMENTS
+------------------------------ */
+.loopSliderWrap:after {
+    content: "";
+    display: none;
+    clear: none;
+}

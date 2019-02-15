@@ -1,6 +1,5 @@
 import firebase from './firebase';
-const AMAZON_EMAIL = process.env.AMAZON_EMAIL;
-const AMAZON_PASSWORD = process.env.AMAZON_PASSWORD;
+import { sha256 } from 'js-sha256';
 const amazonKindleUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
 const pc = {
     name: 'Desktop 1920x1080',
@@ -17,6 +16,7 @@ export default class {
     pages: any;
     amazonEmail: any;
     amazonPassword: any;
+    userId: any;
     scrapeAll: any;
     additionalPageNum: any;
 
@@ -26,19 +26,9 @@ export default class {
         this.pages = new Array();
         this.amazonEmail = amazonEmail;
         this.amazonPassword = amazonPassword;
-        this.scrapeAll = false;
-        this.additionalPageNum = 2;
-
-        if(options.hasOwnProperty('scrapeAll')) {
-            if(options.scrapeAll !== undefined) {
-                this.scrapeAll = options.scrapeAll;
-            }
-        }
-        if(options.hasOwnProperty('additionalPageNum')) {
-            if(options.additionalPageNum !== undefined) {
-                this.additionalPageNum = options.additionalPageNum;
-            }
-        }
+        this.userId = sha256(amazonEmail + amazonPassword);
+        this.scrapeAll = options.scrapeAll === undefined ? false : options.scrapeAll;
+        this.additionalPageNum = options.additionalPageNum === undefined ? 2 : options.additionalPageNum;
     }
 
     async setUpEnvironment() {
@@ -63,20 +53,21 @@ export default class {
         const page = this.page;
         const password_input = await page.$('#ap_password');
         if(password_input !== null) {
-            await page.type('#ap_password', AMAZON_PASSWORD);
+            await page.type('#ap_password', this.amazonPassword);
         }
 
         const email_input = await page.$('#ap_email');
         if(email_input !== null) {
-            await page.type('#ap_email', AMAZON_EMAIL);
+            await page.type('#ap_email', this.amazonEmail);
         }
 
         await page.click('#signInSubmit');
     }
 
     async restoreCookies() {
-        const docRef = await firebase.db.collection('cookies').doc('amazon');
-        const amazonCookiesDoc: any = await docRef.get()
+        const userRef = await firebase.db.collection('users').doc(this.userId);
+        const amazonCookiesDoc: any = await userRef.collection('cookies')
+            .doc('amazon').get()
             .catch((err) => console.error(err));
         if (!amazonCookiesDoc.exists) {
             console.error('amazon cookies does not exist');
@@ -90,7 +81,8 @@ export default class {
     async saveCookies() {
         const cookies = await this.page.cookies();
         const batch = firebase.db.batch();
-        const docRef = await firebase.db.collection('cookies').doc('amazon');
+        const userRef = await firebase.db.collection('users').doc(this.userId);
+        const docRef = await userRef.collection('cookies').doc('amazon');
         const data = new Object();
         for (const cookie of cookies) {
             data[cookie.name] = cookie;
