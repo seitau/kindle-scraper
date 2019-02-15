@@ -16,6 +16,14 @@ admin.initializeApp({
 admin.firestore().settings(settings);
 const db = admin.firestore()
 
+const authenticate = async function(email, password) {
+    const userId = sha256(email + password);
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+
+    }
+}
+
 const firebase = {
     db,
     functions,

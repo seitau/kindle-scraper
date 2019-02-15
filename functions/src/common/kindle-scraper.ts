@@ -19,6 +19,7 @@ export default class {
     userId: any;
     scrapeAll: any;
     additionalPageNum: any;
+    userRef: any;
 
     constructor(browser, page, amazonEmail, amazonPassword, options: any = {}) {
         this.browser = browser
@@ -29,6 +30,14 @@ export default class {
         this.userId = sha256(amazonEmail + amazonPassword);
         this.scrapeAll = options.scrapeAll === undefined ? false : options.scrapeAll;
         this.additionalPageNum = options.additionalPageNum === undefined ? 2 : options.additionalPageNum;
+        this.userRef = firebase.db.collection('users').doc(this.userId);
+    }
+
+    async hasCookies() {
+        const amazonCookiesDoc: any = await this.userRef.collection('cookies')
+            .doc('amazon').get()
+            .catch((err) => console.error(err));
+        return amazonCookiesDoc.exists;
     }
 
     async setUpEnvironment() {
@@ -36,8 +45,10 @@ export default class {
         console.log('Emulating device');
         await page.emulate(pc);
 
-        console.log('Restoring cookie');
-        await this.restoreCookies();
+        if (await this.hasCookies()) {
+            console.log('Restoring cookie');
+            await this.restoreCookies();
+        }
 
         console.log('Opening amazon kindle website');
         await page.goto(amazonKindleUrl, {waitUntil: 'load'});
@@ -65,8 +76,7 @@ export default class {
     }
 
     async restoreCookies() {
-        const userRef = await firebase.db.collection('users').doc(this.userId);
-        const amazonCookiesDoc: any = await userRef.collection('cookies')
+        const amazonCookiesDoc: any = await this.userRef.collection('cookies')
             .doc('amazon').get()
             .catch((err) => console.error(err));
         if (!amazonCookiesDoc.exists) {
@@ -81,8 +91,7 @@ export default class {
     async saveCookies() {
         const cookies = await this.page.cookies();
         const batch = firebase.db.batch();
-        const userRef = await firebase.db.collection('users').doc(this.userId);
-        const docRef = await userRef.collection('cookies').doc('amazon');
+        const docRef = await this.userRef.collection('cookies').doc('amazon');
         const data = new Object();
         for (const cookie of cookies) {
             data[cookie.name] = cookie;
@@ -209,7 +218,7 @@ export default class {
             }
             const batch = firebase.db.batch();
             for (const bookData of bookDatas) {
-                const docRef = firebase.db.collection('books').doc(bookData.title);
+                const docRef = this.userRef.collection('books').doc(bookData.title);
                 batch.set(docRef, {
                     title: bookData.title,
                     book_cover_image_url: bookData.image,
