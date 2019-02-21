@@ -1,19 +1,33 @@
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-const lifeShift = "ＬＩＦＥ　ＳＨＩＦＴ（ライフ・シフト）―１００年時代の人生戦略";
 const userRef = firebase.firestore().collection('users').doc(userId); 
-userRef.collection('books').doc(lifeShift).collection('lines').get()
-    .then((datas) => {
-        $( ".loopSlider" ).append( "<ul></ul>" );
-        const linesPromise = datas.forEach((data) => { 
-            $( "div.loopSlider ul").append( "<li>" + data.data().line + "</li>" );
+const booksRef = userRef.collection('books'); 
+booksRef.get()
+    .then((books) => {
+        let linesPromises = new Array();
+        let i = 0;
+        books.forEach((book) => {
+            console.log(i)
+            const title = book.data().title;
+            console.log(title)
+            if (i < 5) {
+                linesPromises.push(booksRef.doc(title).collection('lines').get());
+            }
+            i++;
         });
-
+        return Promise.all(linesPromises);
+    })
+    .then((linesArray) => {
+        linesArray.forEach((lines) => {
+            const linesPromise = lines.forEach((data) => {
+                $( ".loopSlider" ).append( "<ul></ul>" );
+                $( "div.loopSlider ul").append( "<li>" + data.data().line + "</li>" );
+            });
+        });
         return Promise.resolve();
     })
     .then(() => {
-        (function(){
             var setElm = $('.loopSlider'),
-                slideSpeed = 6000;
+                slideSpeed = 500;
 
             setElm.each(function(){
                 var self = $(this),
@@ -42,14 +56,7 @@ userRef.collection('books').doc(lifeShift).collection('lines').get()
                         });
                     };
                     loopMove();
-
-                    //   setElm.hover(function() {
-                    //       selfWrap.pause();
-                    //   }, function() {
-                    //       selfWrap.resume();
-                    //   });
                 }
             });
-        })();
     })
     .catch((err) => console.error(err));

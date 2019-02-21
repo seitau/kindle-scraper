@@ -2,7 +2,7 @@
     "scripts": {
         "watch-js": "watchify src/js/*.js -o dist/js/bundle.js -dv",
         "watch-css": "catw ./src/css/style.css -o ./dist/css/style.css",
-        "watch": "npm run watch-js && npm run watch-css",
+        "watch": "npm run watch-css & npm run watch-js",
         "build": "browserify src/js/main.js -o dist/js/bundle.js && cp -r ./src/css ./dist/"
     },
     "dependencies": {
