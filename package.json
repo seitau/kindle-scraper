@@ -1,13 +1,21 @@
 {
-  "dependencies": {
-    "@google-cloud/language": "^2.0.1",
-    "chart.js": "^2.7.3",
-    "dotenv": "^6.2.0",
-    "evernote": "^2.0.5",
-    "feedparser": "^2.2.9",
-    "giojs": "^2.0.0",
-    "oauth": "^0.9.15",
-    "request": "^2.88.0",
-    "websocket": "^1.0.28"
-  }
+    "scripts": {
+        "watch-js": "watchify src/js/*.js -o dist/js/bundle.js -dv",
+        "watch-css": "catw ./src/css/style.css -o ./dist/css/style.css",
+        "watch": "npm run watch-js && npm run watch-css",
+        "build": "browserify src/js/main.js -o dist/js/bundle.js && cp -r ./src/css ./dist/"
+    },
+    "dependencies": {
+        "@google-cloud/language": "^2.0.1",
+        "chart.js": "^2.7.3",
+        "dotenv": "^6.2.0",
+        "evernote": "^2.0.5",
+        "feedparser": "^2.2.9",
+        "giojs": "^2.0.0",
+        "js-sha256": "^0.9.0",
+        "oauth": "^0.9.15",
+        "request": "^2.88.0",
+        "watchify": "^3.11.1",
+        "websocket": "^1.0.28"
+    }
 }

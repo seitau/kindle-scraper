@@ -22,6 +22,7 @@ html, body, div{
     position: relative;
     overflow: hidden;
 }
+
 .loopSlider ul {
     height: 100px;
     /*float: left;*/

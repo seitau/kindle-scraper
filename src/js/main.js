@@ -1,5 +1,7 @@
+const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 const lifeShift = "ＬＩＦＥ　ＳＨＩＦＴ（ライフ・シフト）―１００年時代の人生戦略";
-firebase.firestore().collection('books').doc(lifeShift).collection('lines').get()
+const userRef = firebase.firestore().collection('users').doc(userId); 
+userRef.collection('books').doc(lifeShift).collection('lines').get()
     .then((datas) => {
         $( ".loopSlider" ).append( "<ul></ul>" );
         const linesPromise = datas.forEach((data) => { 
@@ -11,7 +13,7 @@ firebase.firestore().collection('books').doc(lifeShift).collection('lines').get(
     .then(() => {
         (function(){
             var setElm = $('.loopSlider'),
-                slideSpeed = 2000;
+                slideSpeed = 6000;
 
             setElm.each(function(){
                 var self = $(this),

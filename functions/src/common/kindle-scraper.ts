@@ -41,6 +41,7 @@ export default class {
     }
 
     async setUpEnvironment() {
+        console.log('Authenticating: ' + this.userId);
         await firebase.authenticate(this.userId);
         const page = this.page;
         console.log('Emulating device');
@@ -56,7 +57,7 @@ export default class {
 
         const password_input = await page.$('#ap_password');
         if(password_input !== null) {
-            console.log('Opening amazon kindle website');
+            console.log('Logging in to amazon kindle');
             await this.login();
         }
     }
@@ -64,15 +65,18 @@ export default class {
     async login() {
         const page = this.page;
         const password_input = await page.$('#ap_password');
+        console.log('Typing password');
         if(password_input !== null) {
             await page.type('#ap_password', this.amazonPassword);
         }
 
         const email_input = await page.$('#ap_email');
+        console.log('Typing email');
         if(email_input !== null) {
             await page.type('#ap_email', this.amazonEmail);
         }
 
+        console.log('Submitting form');
         await page.click('#signInSubmit');
     }
 
@@ -81,7 +85,7 @@ export default class {
             .doc('amazon').get()
             .catch((err) => console.error(err));
         if (!amazonCookiesDoc.exists) {
-            console.error('amazon cookies does not exist');
+            console.error('Amazon cookies does not exist');
         }
         const amazonCookies = amazonCookiesDoc.data();
         for (const name in amazonCookies) {
