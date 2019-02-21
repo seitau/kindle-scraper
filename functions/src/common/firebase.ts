@@ -1,22 +1,21 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { sha256 } from 'js-sha256';
-const settings = {timestampsInSnapshots: true};
 
 let serviceAccount;
 if (process.env.NODE_ENV === 'test') {
-    serviceAccount = require('../../../service_account/secret.json');;
+    serviceAccount = require('../../../service_account/secret.json');
 } else {
-    serviceAccount = functions.config().account.cert;
+    serviceAccount = functions.config().service_account;
 }
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
-admin.firestore().settings(settings);
 const db = admin.firestore()
 
-async function createNewUser(userId) {
+const createNewUser = async function(userId) {
+    console.log('Creating new user');
     return await admin.auth().createUser({
         uid: userId,
     })
@@ -27,6 +26,7 @@ async function createNewUser(userId) {
 const authenticate = async function(userId) {
     const userDoc = await db.collection('users').doc(userId).get();
     if (!userDoc.exists) {
+        console.log('User: ' + userId + ' does not exist');
         await createNewUser(userId);
     }
 }

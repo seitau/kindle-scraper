@@ -30,7 +30,6 @@ export default class {
         this.userId = sha256(amazonEmail + amazonPassword);
         this.scrapeAll = options.scrapeAll === undefined ? false : options.scrapeAll;
         this.additionalPageNum = options.additionalPageNum === undefined ? 2 : options.additionalPageNum;
-        this.userRef = firebase.db.collection('users').doc(this.userId);
     }
 
     async hasCookies() {
@@ -43,6 +42,9 @@ export default class {
     async setUpEnvironment() {
         console.log('Authenticating: ' + this.userId);
         await firebase.authenticate(this.userId);
+        this.userRef = firebase.db.collection('users').doc(this.userId);
+        console.log('Authenticated: ' + this.userId);
+
         const page = this.page;
         console.log('Emulating device');
         await page.emulate(pc);
