@@ -41,6 +41,7 @@ export default class {
     }
 
     async setUpEnvironment() {
+        await firebase.authenticate(this.userId);
         const page = this.page;
         console.log('Emulating device');
         await page.emulate(pc);

@@ -16,11 +16,18 @@ admin.initializeApp({
 admin.firestore().settings(settings);
 const db = admin.firestore()
 
-const authenticate = async function(email, password) {
-    const userId = sha256(email + password);
+async function createNewUser(userId) {
+    return await admin.auth().createUser({
+        uid: userId,
+    })
+        .catch((err) => {
+        console.error("Error creating new user:", err);
+    });
+}
+const authenticate = async function(userId) {
     const userDoc = await db.collection('users').doc(userId).get();
     if (!userDoc.exists) {
-
+        await createNewUser(userId);
     }
 }
 
@@ -28,6 +35,7 @@ const firebase = {
     db,
     functions,
     admin,
+    authenticate,
 };
 
 export default firebase;
