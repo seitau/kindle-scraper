@@ -51,6 +51,7 @@ class Thread {
     }
 }
 
+const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
 let threads = new Object();
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 function setup() {
@@ -66,7 +67,7 @@ function setup() {
                     angularVelocity: 0.04,
                     amplitude: 75.0,
                     period: 200,
-                    color: 'yellow',
+                    color: colorScale(0.5),
                     height: 300,
                 }
                 const thread = new Thread(param);
