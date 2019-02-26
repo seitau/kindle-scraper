@@ -11,7 +11,7 @@ class Thread {
         this.color = param.color;
         this.circles = new Array();
         this.radius = 16;
-        this.height = param.height;
+        this.yaxis = param.yaxis;
     }
 
     calculateWave() {
@@ -31,7 +31,7 @@ class Thread {
         this.circles = new Array();
         for (let x = 0; x < this.yvalues.length; x++) {
             let cx = x * this.xspacing;
-            let cy = this.height/2 + this.yvalues[x];
+            let cy = this.yaxis + this.yvalues[x];
             ellipse(cx, cy, this.radius, this.radius);
             this.circles.push({
                 x: cx,
@@ -55,36 +55,39 @@ const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
 let threads = new Object();
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 function setup() {
-    createCanvas(windowWidth, 300);
+    createCanvas(windowWidth, windowHeight);
     background(0);
     getBookDatas(userId)
       .then((bookDatas) => {
-            for (const [index, title] of Object.entries(bookDatas)) {
-                const param = {
-                    title: title,
-                    xspacing: 7,
-                    theta: 0,
-                    angularVelocity: 0.04,
-                    amplitude: 75.0,
-                    period: 200,
-                    color: colorScale(0.5),
-                    height: 300,
-                }
-                const thread = new Thread(param);
-                threads[index] = thread
-            }
+          const bookDatasArray = Object.entries(bookDatas);
+          for (let i = 0; i < bookDatasArray.length; i++) {
+              const [ title ] = bookDatasArray[i];
+              const param = {
+                  title: title,
+                  xspacing: 7,
+                  theta: 0,
+                  angularVelocity: 0.04,
+                  amplitude: 75.0,
+                  period: 200,
+                  color: colorScale(0.5),
+                  yaxis: 250 * i + 150,
+              }
+              console.log(param.height)
+              const thread = new Thread(param);
+              threads[i] = thread
+          }
       });
 }
 
 function draw() {
     background(0);
-    for(let index in threads) {
-        threads[index].render()
+    for(let i in threads) {
+        threads[i].render()
     }
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, 300);
+    resizeCanvas(windowWidth, windowHeight);
     background(0);
 }
 
