@@ -51,37 +51,35 @@ class Thread {
     }
 }
 
-let thread;
-let thread_2;
-let thread_3;
-let thread_4;
-let thread_5;
-let thread_6;
 let threads = new Object();
-let param = {
-    xspacing: 7,
-    theta: 0,
-    angularVelocity: 0.04,
-    amplitude: 75.0,
-    period: 200,
-    color: 'yellow',
-    height: 300,
-}
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-
 function setup() {
     createCanvas(windowWidth, 300);
-    thread = new Thread(param);
+    background(0);
     getBookDatas(userId)
       .then((bookDatas) => {
-
+            for (const [index, title] of Object.entries(bookDatas)) {
+                const param = {
+                    title: title,
+                    xspacing: 7,
+                    theta: 0,
+                    angularVelocity: 0.04,
+                    amplitude: 75.0,
+                    period: 200,
+                    color: 'yellow',
+                    height: 300,
+                }
+                const thread = new Thread(param);
+                threads[index] = thread
+            }
       });
-    background(0);
 }
 
 function draw() {
     background(0);
-    thread.render()
+    for(let index in threads) {
+        threads[index].render()
+    }
 }
 
 function windowResized() {
@@ -123,13 +121,6 @@ function getBookDatas(userId) {
                 });
             }
             return promiseChain;
-        })
-        .then((bookDatas) => {
-            for (const title in bookDatas) {
-                console.log(title);
-                console.log(bookDatas[title]);
-            }
-            return Promise.resolve();
         })
         .catch((err) => console.error(err));
 }
