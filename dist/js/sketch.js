@@ -11,6 +11,7 @@ class Thread {
         this.color = param.color;
         this.circles = new Array();
         this.radius = 16;
+        this.height = param.height;
     }
 
     calculateWave() {
@@ -29,9 +30,8 @@ class Thread {
         fill(this.color);
         this.circles = new Array();
         for (let x = 0; x < this.yvalues.length; x++) {
-            //ellipse(x * this.xspacing, windowHeight / 2 + this.yvalues[x], 16, 16);
             let cx = x * this.xspacing;
-            let cy = 300/2 + this.yvalues[x];
+            let cy = this.height/2 + this.yvalues[x];
             ellipse(cx, cy, this.radius, this.radius);
             this.circles.push({
                 x: cx,
@@ -47,12 +47,10 @@ class Thread {
             if (d < this.radius) {
                 console.log('ohohohohoh');
             }
-
         }
     }
 }
 
-let threadCircles = new Array();
 let thread;
 let thread_2;
 let thread_3;
@@ -67,26 +65,23 @@ let param = {
     amplitude: 75.0,
     period: 200,
     color: 'yellow',
+    height: 300,
 }
+const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+
 function setup() {
     createCanvas(windowWidth, 300);
     thread = new Thread(param);
-    //thread_2 = new Thread(10, 0.0, 0.04, 100.0, 500.0, 'blue');
-    //thread_3 = new Thread(10, 3.0, 0.02, 80.0, 500.0, 'red');
-    //thread_4 = new Thread(10, 6.0, 0.04, 90.0, 500.0, 'green');
-    //thread_5 = new Thread(10, 1.0, 0.04, 70.0, 500.0, 'pink');
-    //thread_6 = new Thread(10, 8.0, 0.01, 70.0, 500.0, 'gray');
+    getBookDatas(userId)
+      .then((bookDatas) => {
+
+      });
     background(0);
 }
 
 function draw() {
     background(0);
     thread.render()
-    //thread_2.render()
-    //thread_3.render()
-    //thread_4.render()
-    //thread_5.render()
-    //thread_6.render()
 }
 
 function windowResized() {
@@ -98,3 +93,43 @@ function mousePressed() {
     thread.clicked(mouseX, mouseY);
 }
 
+function getBookDatas(userId) {
+    const userRef = firebase.firestore().collection('users').doc(userId);
+    const booksRef = userRef.collection('books');
+    return booksRef.get()
+        .then((books) => {
+            let titles = new Array();
+            books.forEach((book) => {
+                const title = book.data().title;
+                titles.push(title);
+            });
+
+            let bookDatas = new Object();
+            let promiseChain = Promise.resolve(bookDatas);
+            //for (let i = 0; i < titles.length; i++) {
+            for (let i = 0; i < 5; i++) {
+                promiseChain = promiseChain.then((bookDatas) => {
+                    return booksRef.doc(titles[i]).collection('lines').get()
+                        .then((lines) => {
+                            bookDatas[titles[i]] = new Array();
+                            lines.forEach((line) => {
+                                bookDatas[titles[i]].push(line.data().line);
+                            });
+                            return Promise.resolve(bookDatas);
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+                });
+            }
+            return promiseChain;
+        })
+        .then((bookDatas) => {
+            for (const title in bookDatas) {
+                console.log(title);
+                console.log(bookDatas[title]);
+            }
+            return Promise.resolve();
+        })
+        .catch((err) => console.error(err));
+}
