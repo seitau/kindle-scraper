@@ -13,7 +13,7 @@ class Thread {
         this.yvalues = new Array(p5.floor(this.width / this.xspacing));
         this.color = param.color;
         this.circles = new Array();
-        this.radius = 16;
+        this.radius = 5;
         this.yaxis = param.yaxis;
     }
 
@@ -57,6 +57,42 @@ class Thread {
     }
 }
 
+class Threads {
+    constructor(p5, book) {
+        this.p5 = p5;
+        this.threads = new Array();
+        const lines = book.lines;
+        for (const line of book.lines) {
+            const param = {
+                title: book.title,
+                xspacing: 7,
+                theta: 0,
+                angularVelocity: 0.04,
+                amplitude: 75.0,
+                //period: 200,
+                period: line.length * 50,
+                color: colorScale(p5.random(1)),
+                yaxis: 250 * book.index + 150,
+            }
+            const thread = new Thread(p5, param);
+            this.threads.push(thread);
+        }
+    }
+
+    render() {
+        for(const thread of this.threads) {
+            thread.render();
+        }
+    }
+
+    clicked(x, y) {
+        for(const thread of this.threads) {
+            thread.clicked(x, y);
+        }
+    }
+}
+
+const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
 function getBookDatas(userId) {
     const userRef = firebase.firestore().collection('users').doc(userId);
     const booksRef = userRef.collection('books');
@@ -92,49 +128,53 @@ function getBookDatas(userId) {
 }
 
 const sketch = function(p5) {
-    const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
-    let threads = new Object();
+    const colorScale = colorScale;
+    let threadsOfKnowledge = new Object();
     const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+    const threadsCanvasHeight = 500;
+    let bookNum = 5;
 
   p5.setup = function() {
-    p5.createCanvas(900, 900)
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     p5.background(0);
     getBookDatas(userId)
       .then((bookDatas) => {
+          let i = 0;
           const bookDatasArray = Object.entries(bookDatas);
-          for (let i = 0; i < bookDatasArray.length; i++) {
-              const [ title ] = bookDatasArray[i];
-              const param = {
-                  title: title,
-                  xspacing: 7,
-                  theta: 0,
-                  angularVelocity: 0.04,
-                  amplitude: 75.0,
-                  period: 200,
-                  color: colorScale(0.5),
-                  yaxis: 250 * i + 150,
+          for (const [ title, lines ] of bookDatasArray) {
+              if (lines.length === 0) {
+                  continue;
               }
-              const thread = new Thread(p5, param);
-              threads[i] = thread
+              const book = {
+                  title: title,
+                  lines: lines,
+                  index: i,
+              };
+              const threads = new Threads(p5, book);
+              threadsOfKnowledge[i] = threads;
+              i++;
           }
+          bookNum = i;
+          p5.createCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
       });
   }
 
   p5.draw = function() {
     p5.background(0);
-    for(let i in threads) {
-        threads[i].render()
+    for(let i in threadsOfKnowledge) {
+        threadsOfKnowledge[i].render();
     }
   }
 
   p5.windowResized = function() {
-    p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    p5.resizeCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
     p5.background(0);
   }
 
   p5.mousePressed = function() {
-      thread.clicked(p5.mouseX, p5.mouseY);
+    for(let i in threadsOfKnowledge) {
+        threadsOfKnowledge[i].clicked(p5.mouseX, p5.mouseY);
+    }
   }
 }
 
