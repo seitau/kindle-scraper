@@ -1,62 +1,130 @@
-const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-const userRef = firebase.firestore().collection('users').doc(userId); 
-const booksRef = userRef.collection('books'); 
-booksRef.get()
-    .then((books) => {
-        let linesPromises = new Array();
-        let i = 0;
-        books.forEach((book) => {
-            console.log(i)
-            const title = book.data().title;
-            console.log(title)
-            if (i < 5) {
-                linesPromises.push(booksRef.doc(title).collection('lines').get());
+class Thread {
+    constructor(param) {
+        this.xspacing = param.xspacing;
+        this.width = windowWidth;
+        this.theta = param.theta;
+        this.angularVelocity = param.angularVelocity;
+        this.amplitude = param.amplitude;
+        this.period = param.period;
+        this.dx = (TWO_PI / this.period) * this.xspacing 
+        this.yvalues = new Array(floor(this.width / this.xspacing));
+        this.color = param.color;
+        this.circles = new Array();
+        this.radius = 16;
+        this.yaxis = param.yaxis;
+    }
+
+    calculateWave() {
+        this.theta += this.angularVelocity;
+
+        let x = this.theta;
+        for (let i = 0; i < this.yvalues.length; i++) {
+            this.yvalues[i] = sin(x) * this.amplitude;
+            x += this.dx;
+        }
+    }
+
+    render() {
+        this.calculateWave();
+        noStroke();
+        fill(this.color);
+        this.circles = new Array();
+        for (let x = 0; x < this.yvalues.length; x++) {
+            let cx = x * this.xspacing;
+            let cy = this.yaxis + this.yvalues[x];
+            ellipse(cx, cy, this.radius, this.radius);
+            this.circles.push({
+                x: cx,
+                y: cy,
+            });
+        }
+    }
+
+    clicked(x, y) {
+        for (let i = 0; i < this.circles.length; i++) {
+            const circle = this.circles[i];
+            let d = dist(x, y, circle.x, circle.y);
+            if (d < this.radius) {
+                console.log('ohohohohoh');
             }
-            i++;
-        });
-        return Promise.all(linesPromises);
-    })
-    .then((linesArray) => {
-        linesArray.forEach((lines) => {
-            const linesPromise = lines.forEach((data) => {
-                $( ".loopSlider" ).append( "<ul></ul>" );
-                $( "div.loopSlider ul").append( "<li>" + data.data().line + "</li>" );
+        }
+    }
+}
+
+const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
+let threads = new Object();
+const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    background(0);
+    getBookDatas(userId)
+      .then((bookDatas) => {
+          const bookDatasArray = Object.entries(bookDatas);
+          for (let i = 0; i < bookDatasArray.length; i++) {
+              const [ title ] = bookDatasArray[i];
+              const param = {
+                  title: title,
+                  xspacing: 7,
+                  theta: 0,
+                  angularVelocity: 0.04,
+                  amplitude: 75.0,
+                  period: 200,
+                  color: colorScale(0.5),
+                  yaxis: 250 * i + 150,
+              }
+              console.log(param.height)
+              const thread = new Thread(param);
+              threads[i] = thread
+          }
+      });
+}
+
+function draw() {
+    background(0);
+    for(let i in threads) {
+        threads[i].render()
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    background(0);
+}
+
+function mousePressed() {
+    thread.clicked(mouseX, mouseY);
+}
+
+function getBookDatas(userId) {
+    const userRef = firebase.firestore().collection('users').doc(userId);
+    const booksRef = userRef.collection('books');
+    return booksRef.get()
+        .then((books) => {
+            let titles = new Array();
+            books.forEach((book) => {
+                const title = book.data().title;
+                titles.push(title);
             });
-        });
-        return Promise.resolve();
-    })
-    .then(() => {
-            var setElm = $('.loopSlider'),
-                slideSpeed = 500;
 
-            setElm.each(function(){
-                var self = $(this),
-                    selfWidth = self.innerWidth(),
-                    findUl = self.find('ul'),
-                    findLi = findUl.find('li'),
-                    listWidth = findLi.outerWidth(),
-                    listCount = findLi.length,
-                    loopWidth = listWidth * listCount;
-                console.log(loopWidth)
-                console.log(selfWidth)
-
-                findUl.wrapAll('<div class="loopSliderWrap" />');
-                var selfWrap = self.find('.loopSliderWrap');
-
-                if(loopWidth >= selfWidth){
-                    findUl.css({width:loopWidth}).clone().appendTo(selfWrap);
-
-                    selfWrap.css({width:loopWidth*2});
-
-                    function loopMove(){
-                        console.log('-' + (loopWidth) + 'px')
-                        selfWrap.animate({left:'-' + (loopWidth) + 'px'},slideSpeed*listCount,'linear',function(){
-                            selfWrap.css({left:'0'});
-                            loopMove();
+            let bookDatas = new Object();
+            let promiseChain = Promise.resolve(bookDatas);
+            //for (let i = 0; i < titles.length; i++) {
+            for (let i = 0; i < 5; i++) {
+                promiseChain = promiseChain.then((bookDatas) => {
+                    return booksRef.doc(titles[i]).collection('lines').get()
+                        .then((lines) => {
+                            bookDatas[titles[i]] = new Array();
+                            lines.forEach((line) => {
+                                bookDatas[titles[i]].push(line.data().line);
+                            });
+                            return Promise.resolve(bookDatas);
+                        })
+                        .catch((err) => {
+                            console.error(err);
                         });
-                    };
-                    loopMove();
-                }
-            });
-    })
-    .catch((err) => console.error(err));
+                });
+            }
+            return promiseChain;
+        })
+        .catch((err) => console.error(err));
+}

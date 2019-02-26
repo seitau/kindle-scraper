@@ -1,9 +1,9 @@
 {
     "scripts": {
-        "watch-js": "watchify src/js/*.js -o dist/js/bundle.js -dv",
+        "watch-js": "watchify -t babelify src/js/*.js -o dist/js/bundle.js -dv",
         "watch-css": "catw ./src/css/style.css -o ./dist/css/style.css",
         "watch": "npm run watch-css & npm run watch-js",
-        "build": "browserify src/js/main.js -o dist/js/bundle.js && cp -r ./src/css ./dist/"
+        "build": "browserify -t babelify src/js/main.js -o dist/js/bundle.js && cp -r ./src/css ./dist/"
     },
     "dependencies": {
         "@google-cloud/language": "^2.0.1",
@@ -17,5 +17,11 @@
         "request": "^2.88.0",
         "watchify": "^3.11.1",
         "websocket": "^1.0.28"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.3.4",
+        "@babel/preset-env": "^7.3.4",
+        "babel-preset-env": "^1.7.0",
+        "babelify": "^10.0.0"
     }
 }
