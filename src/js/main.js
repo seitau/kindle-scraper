@@ -134,48 +134,48 @@ const sketch = function(p5) {
     const threadsCanvasHeight = 500;
     let bookNum = 5;
 
-  p5.setup = function() {
-    p5.createCanvas(p5.windowWidth, p5.windowHeight);
-    p5.background(0);
-    getBookDatas(userId)
-      .then((bookDatas) => {
-          let i = 0;
-          const bookDatasArray = Object.entries(bookDatas);
-          for (const [ title, lines ] of bookDatasArray) {
-              if (lines.length === 0) {
-                  continue;
-              }
-              const book = {
-                  title: title,
-                  lines: lines,
-                  index: i,
-              };
-              const threads = new Threads(p5, book);
-              threadsOfKnowledge[i] = threads;
-              i++;
-          }
-          bookNum = i;
-          p5.createCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
-      });
-  }
-
-  p5.draw = function() {
-    p5.background(0);
-    for(let i in threadsOfKnowledge) {
-        threadsOfKnowledge[i].render();
+    p5.setup = function() {
+        p5.createCanvas(p5.windowWidth, p5.windowHeight);
+        p5.background(0);
+        getBookDatas(userId)
+            .then((bookDatas) => {
+                let i = 0;
+                const bookDatasArray = Object.entries(bookDatas);
+                for (const [ title, lines ] of bookDatasArray) {
+                    if (lines.length === 0) {
+                        continue;
+                    }
+                    const book = {
+                        title: title,
+                        lines: lines,
+                        index: i,
+                    };
+                    const threads = new Threads(p5, book);
+                    threadsOfKnowledge[i] = threads;
+                    i++;
+                }
+                bookNum = i;
+                p5.createCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
+            });
     }
-  }
 
-  p5.windowResized = function() {
-    p5.resizeCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
-    p5.background(0);
-  }
-
-  p5.mousePressed = function() {
-    for(let i in threadsOfKnowledge) {
-        threadsOfKnowledge[i].clicked(p5.mouseX, p5.mouseY);
+    p5.draw = function() {
+        p5.background(0);
+        for(let i in threadsOfKnowledge) {
+            threadsOfKnowledge[i].render();
+        }
     }
-  }
+
+    p5.windowResized = function() {
+        p5.resizeCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
+        p5.background(0);
+    }
+
+    p5.mousePressed = function() {
+        for(let i in threadsOfKnowledge) {
+            threadsOfKnowledge[i].clicked(p5.mouseX, p5.mouseY);
+        }
+    }
 }
 
 new P5(sketch)
