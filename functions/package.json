@@ -15,6 +15,7 @@
         "lint": "./node_modules/.bin/tslint --project tsconfig.json"
     },
     "dependencies": {
+        "@google-cloud/language": "^2.0.1",
         "dotenv": "^6.2.0",
         "dotenv-json": "^1.0.0",
         "firebase-admin": "^7.0.0",

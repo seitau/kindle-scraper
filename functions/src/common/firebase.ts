@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { sha256 } from 'js-sha256';
 
 let serviceAccount;
 if (process.env.NODE_ENV === 'test') {
@@ -19,7 +18,7 @@ const createNewUser = async function(userId) {
     return await admin.auth().createUser({
         uid: userId,
     })
-        .catch((err) => {
+    .catch((err) => {
         console.error("Error creating new user:", err);
     });
 }
