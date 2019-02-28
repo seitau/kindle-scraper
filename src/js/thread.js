@@ -84,4 +84,9 @@ export default class Thread {
             }
         }
     }
+
+    changeWidthToWindow() {
+        this.width = this.p5.windowWidth;
+        this.yaxis = this.p5.windowHeight / 2;
+    }
 }

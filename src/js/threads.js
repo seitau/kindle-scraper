@@ -45,5 +45,11 @@ export default class Threads {
             thread.clicked(x, y);
         }
     }
+
+    windowResized() {
+        for(const thread of this.threads) {
+            thread.changeWidthToWindow(x, y);
+        }
+    }
 }
 

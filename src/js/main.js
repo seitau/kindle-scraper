@@ -62,9 +62,7 @@ const sketch = function(p5) {
         sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
         sel.center('horizontal');
         for (const title in threadOfWords) {
-            for (const thread of threadOfWords[title].threads) {
-                thread.yaxis = p5.windowHeight/2;
-            }
+            threadOfWords[title].windowResized();
         }
     }
 
