@@ -38,7 +38,6 @@ export default class Thread {
         this.yvalues = new Array(p5.floor(this.width / this.xspacing));
         this.color = param.color;
         this.yaxis = param.yaxis;
-        console.log(this.tags)
     }
 
     async analyze() {

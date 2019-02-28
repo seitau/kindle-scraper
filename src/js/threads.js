@@ -14,11 +14,11 @@ export default class Threads {
                 xspacing: 7,
                 theta: 0,
                 angularVelocity: 0.04,
-                amplitude: 75.0,
+                amplitude: 125.0,
                 //period: 200,
                 period: line.length * 50,
                 color: colorScale(p5.random(1)),
-                yaxis: 250 * book.index + 150,
+                yaxis: 400 * book.index + 200,
             }
             const thread = new Thread(p5, param);
             this.threads.push(thread);

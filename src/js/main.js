@@ -1,4 +1,3 @@
-import P5 from 'p5'
 import 'babel-polyfill';
 import Threads from './threads';
 import { colorScale, getBookDatas } from './helpers';
@@ -7,7 +6,7 @@ const sketch = function(p5) {
     const colorScale = colorScale;
     let threadsOfKnowledge = new Object();
     const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-    const threadsCanvasHeight = 500;
+    const threadsCanvasHeight = 800;
     let bookNum = 5;
 
     p5.setup = function() {
@@ -35,6 +34,12 @@ const sketch = function(p5) {
                 bookNum = i;
                 p5.createCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
             });
+        p5.textAlign(p5.CENTER);
+        const sel = p5.createSelect();
+        sel.position(10, 10);
+        sel.option('pear');
+        sel.option('kiwi');
+        sel.option('grape');
     }
 
     p5.draw = function() {
@@ -56,5 +61,5 @@ const sketch = function(p5) {
     }
 }
 
-new P5(sketch)
+new p5(sketch)
 

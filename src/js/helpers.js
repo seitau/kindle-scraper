@@ -1,4 +1,5 @@
 export const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,1]);
+
 export function getBookDatas(userId) {
     const userRef = firebase.firestore().collection('users').doc(userId);
     const booksRef = userRef.collection('books');
