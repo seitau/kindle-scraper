@@ -1,20 +1,19 @@
 import P5 from 'p5'
+import axios from 'axios';
+import 'babel-polyfill';
+const analyzeLanguageApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/AnalyzeLanguage';
 
 class Thread {
     constructor(p5, param) {
         this.p5 = p5;
-        this.xspacing = param.xspacing;
+        this.userId = param.userId;
+        this.book = param.title;
+        this.line = param.line;
+        this.param = param;
         this.width = p5.windowWidth;
-        this.theta = param.theta;
-        this.angularVelocity = param.angularVelocity;
-        this.amplitude = param.amplitude;
-        this.period = param.period;
-        this.dx = (p5.TWO_PI / this.period) * this.xspacing 
-        this.yvalues = new Array(p5.floor(this.width / this.xspacing));
-        this.color = param.color;
         this.circles = new Array();
         this.radius = 5;
-        this.yaxis = param.yaxis;
+        this.tags = new Array();
     }
 
     calculateWave() {
@@ -25,6 +24,37 @@ class Thread {
         for (let i = 0; i < this.yvalues.length; i++) {
             this.yvalues[i] = p5.sin(x) * this.amplitude;
             x += this.dx;
+        }
+    }
+
+    async initialize() {
+        await this.analyze();
+        const p5 = this.p5;
+        const param = this.param;
+        this.xspacing = param.xspacing;
+        this.theta = param.theta;
+        this.angularVelocity = param.angularVelocity;
+        this.amplitude = param.amplitude;
+        this.period = param.period;
+        this.dx = (p5.TWO_PI / this.period) * this.xspacing 
+        this.yvalues = new Array(p5.floor(this.width / this.xspacing));
+        this.color = param.color;
+        this.yaxis = param.yaxis;
+        console.log(this.tags)
+    }
+
+    async analyze() {
+        try {
+            const response = await axios.post(analyzeLanguageApiEndpoint, {
+                userId: this.userId,
+                book: this.book,
+                line: this.line,
+            });
+            if (response.status === 200) {
+                this.tags = response.data.result;
+            }
+        } catch (err) {
+            console.error('Error analyzing thread: ' + err);
         }
     }
 
@@ -64,7 +94,9 @@ class Threads {
         const lines = book.lines;
         for (const line of book.lines) {
             const param = {
+                userId: book.userId,
                 title: book.title,
+                line: line,
                 xspacing: 7,
                 theta: 0,
                 angularVelocity: 0.04,
@@ -76,6 +108,12 @@ class Threads {
             }
             const thread = new Thread(p5, param);
             this.threads.push(thread);
+        }
+    }
+
+    async initialize() {
+        for(const thread of this.threads) {
+            await thread.initialize();
         }
     }
 
@@ -138,7 +176,7 @@ const sketch = function(p5) {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
         p5.background(0);
         getBookDatas(userId)
-            .then((bookDatas) => {
+            .then(async (bookDatas) => {
                 let i = 0;
                 const bookDatasArray = Object.entries(bookDatas);
                 for (const [ title, lines ] of bookDatasArray) {
@@ -146,11 +184,13 @@ const sketch = function(p5) {
                         continue;
                     }
                     const book = {
+                        userId: userId,
                         title: title,
                         lines: lines,
                         index: i,
                     };
                     const threads = new Threads(p5, book);
+                    await threads.initialize();
                     threadsOfKnowledge[i] = threads;
                     i++;
                 }

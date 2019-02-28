@@ -1,5 +1,7 @@
 import firebase from '../common/firebase';
 import language from '@google-cloud/language';
+import * as cors from 'cors';
+const corsHandler = cors({origin: true});
 
 let serviceAccount;
 if (process.env.NODE_ENV === 'test') {
@@ -9,49 +11,51 @@ if (process.env.NODE_ENV === 'test') {
 }
 const client = new language.LanguageServiceClient(serviceAccount);
 
-export default firebase.functions.https.onRequest(async (req, res) => {
-    if (!/application\/json/g.test(req.get('content-type'))) {
-        console.error("Error: request has to be application/json format");
-        return res.status(400).json({ error: "request has to be application/json format" });
+export default firebase.functions.https.onRequest((req, res) => {
+    corsHandler(req, res, async () => {
+        if (!/application\/json/g.test(req.get('content-type'))) {
+            console.error("Error: request has to be application/json format");
+            return res.status(400).json({ error: "request has to be application/json format" });
 
-    } else if (req.method !== "POST") {
-        console.error("Error: request has to be post method");
-        return res.status(400).json({ error: "request has to be post method" });
-    }
+        } else if (req.method !== "POST") {
+            console.error("Error: request has to be post method");
+            return res.status(400).json({ error: "request has to be post method" });
+        }
 
-    const params = req.body;
-    const hasText = params.hasOwnProperty('line'); 
-    const hasBook = params.hasOwnProperty('book'); 
-    const hasUserId = params.hasOwnProperty('userId'); 
-    if (!hasText || !hasBook || !hasUserId){
-        return res.status(400).json({ error: "Invalid request: required params missing"});
-    }
+        const params = req.body;
+        const hasText = params.hasOwnProperty('line'); 
+        const hasBook = params.hasOwnProperty('book'); 
+        const hasUserId = params.hasOwnProperty('userId'); 
+        if (!hasText || !hasBook || !hasUserId){
+            return res.status(400).json({ error: "Invalid request: required params missing"});
+        }
 
-    const userRef = firebase.db.collection('users').doc(params.userId);
-    const bookRef = userRef.collection('books').doc(params.book);
-    const lineDoc: any = await bookRef.collection('lines').doc(params.line).get()
-        .catch((err) => {
+        const userRef = firebase.db.collection('users').doc(params.userId);
+        const bookRef = userRef.collection('books').doc(params.book);
+        const lineDoc: any = await bookRef.collection('lines').doc(params.line).get()
+            .catch((err) => {
+                return res.status(500).json({ error: err });
+            });
+        const lineData = lineDoc.data();
+        if (lineData.hasOwnProperty('tags')) {
+            return res.status(200).json({ result: lineData.tags });
+        }
+        const document = {
+            content: params.line,
+            type: 'PLAIN_TEXT',
+        };
+        try {
+            const [ syntax ] = await client.analyzeSyntax({ document });
+            const tags = new Array();
+            syntax.tokens.forEach(part => {
+                tags.push(part.partOfSpeech.tag);
+            });
+            await bookRef.collection('lines').doc(params.line).update({
+                tags: tags,
+            })
+            return res.status(200).json({ result: tags });
+        } catch (err) {
             return res.status(500).json({ error: err });
-        });
-    const lineData = lineDoc.data();
-    if (lineData.hasOwnProperty('tags')) {
-        return res.status(200).json({ result: lineData.tags });
-    }
-    const document = {
-        content: params.line,
-        type: 'PLAIN_TEXT',
-    };
-    try {
-        const [ syntax ] = await client.analyzeSyntax({ document });
-        const tags = new Array();
-        syntax.tokens.forEach(part => {
-            tags.push(part.partOfSpeech.tag);
-        });
-        await bookRef.collection('lines').doc(params.line).update({
-            tags: tags,
-        })
-        return res.status(200).json({ result: tags });
-    } catch (err) {
-        return res.status(500).json({ error: err });
-    }
+        }
+    });
 });

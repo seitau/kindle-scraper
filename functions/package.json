@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@google-cloud/language": "^2.0.1",
+        "cors": "^2.8.5",
         "dotenv": "^6.2.0",
         "dotenv-json": "^1.0.0",
         "firebase-admin": "^7.0.0",
