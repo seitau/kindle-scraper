@@ -10,7 +10,16 @@ if (process.env.NODE_ENV === 'test') {
 const client = new language.LanguageServiceClient(serviceAccount);
 
 export default firebase.functions.https.onRequest(async (req, res) => {
-    const params = req.query;
+    if (!/application\/json/g.test(req.get('content-type'))) {
+        console.error("Error: request has to be application/json format");
+        return res.status(400).json({ error: "request has to be application/json format" });
+
+    } else if (req.method !== "POST") {
+        console.error("Error: request has to be post method");
+        return res.status(400).json({ error: "request has to be post method" });
+    }
+
+    const params = req.body;
     const hasText = params.hasOwnProperty('line'); 
     const hasBook = params.hasOwnProperty('book'); 
     const hasUserId = params.hasOwnProperty('userId'); 
