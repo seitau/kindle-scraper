@@ -7,37 +7,38 @@ const sketch = function(p5) {
     const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
     let threadOfWords = new Object();
     let bookNum = 0;
-    let sel;
+    let sel; 
 
-    p5.setup = function() {
+    p5.setup = async function() {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
         p5.background(0);
         p5.textAlign(p5.CENTER);
         sel = p5.createSelect();
         sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
-        getBookDatas(userId)
-            .then(async (bookDatas) => {
-                let i = 0;
-                const bookDatasArray = Object.entries(bookDatas);
-                for (const [ title, lines ] of bookDatasArray) {
-                    if (lines.length === 0) {
-                        continue;
-                    }
-                    const book = {
-                        userId: userId,
-                        title: title,
-                        lines: lines,
-                        index: i,
-                    };
-                    const threads = new Threads(p5, book);
-                    await threads.initialize();
-                    threadOfWords[title] = threads;
-                    sel.option(title);
-                    sel.center('horizontal');
-                    i++;
-                }
-                bookNum = i;
-            });
+
+        const bookDatas = await getBookDatas(userId);
+        let i = 0;
+        const bookDatasArray = Object.entries(bookDatas);
+        for (const [ title, lines ] of bookDatasArray) {
+            if (lines.length === 0) {
+                continue;
+            }
+            const book = {
+                userId: userId,
+                title: title,
+                lines: lines,
+                index: i,
+            };
+            const threads = new Threads(p5, book);
+            await threads.initialize();
+            threadOfWords[title] = threads;
+            i++;
+        }
+        for (const title in threadOfWords) {
+            sel.option(title);
+            sel.center('horizontal');
+        }
+        bookNum = i;
     }
 
     p5.draw = function() {
