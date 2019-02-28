@@ -4,9 +4,11 @@ html, body, div {
 
 html {
     background-color: black;
+    overflow: hidden;
 }
 
 body {
     padding: 0;
     margin: 0;
 }
+

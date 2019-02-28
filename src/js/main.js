@@ -14,6 +14,8 @@ const sketch = function(p5) {
         p5.background(0);
         p5.textAlign(p5.CENTER);
         sel = p5.createSelect();
+        sel.style('height', '30px');
+        sel.style('line-height', '35px');
         sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
         sel.changed(async () => {
             if (!threadOfWords[sel.value()].initialized) {

@@ -14,6 +14,7 @@ export default class Thread {
         this.tags = new Array();
         this.yvalues = new Array();
         this.color = 0;
+        this.xspacing = 0;
     }
 
     calculateWave() {
@@ -37,9 +38,9 @@ export default class Thread {
         this.amplitude = param.amplitude;
         this.period = param.period;
         this.dx = (p5.TWO_PI / this.period) * this.xspacing 
-        this.yvalues = new Array(p5.floor(this.width / this.xspacing));
         this.color = param.color;
         this.yaxis = param.yaxis;
+        this.yvalues = new Array(p5.floor(this.width / this.xspacing));
     }
 
     async analyze() {
@@ -85,8 +86,12 @@ export default class Thread {
         }
     }
 
-    changeWidthToWindow() {
+    fullScreen() {
         this.width = this.p5.windowWidth;
         this.yaxis = this.p5.windowHeight / 2;
+        const newArrayLength = this.p5.floor(this.width / this.xspacing);
+        if (newArrayLength !== Infinity) {
+            this.yvalues = new Array(newArrayLength);
+        }
     }
 }

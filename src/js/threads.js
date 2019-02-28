@@ -48,7 +48,7 @@ export default class Threads {
 
     windowResized() {
         for(const thread of this.threads) {
-            thread.changeWidthToWindow(x, y);
+            thread.fullScreen();
         }
     }
 }
