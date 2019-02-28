@@ -13,8 +13,7 @@ export function getBookDatas(userId) {
 
             let bookDatas = new Object();
             let promiseChain = Promise.resolve(bookDatas);
-            //for (let i = 0; i < titles.length; i++) {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < titles.length; i++) {
                 promiseChain = promiseChain.then((bookDatas) => {
                     return booksRef.doc(titles[i]).collection('lines').get()
                         .then((lines) => {

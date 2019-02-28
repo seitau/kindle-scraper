@@ -4,14 +4,17 @@ import { colorScale, getBookDatas } from './helpers';
 
 const sketch = function(p5) {
     const colorScale = colorScale;
-    let threadsOfKnowledge = new Object();
     const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-    const threadsCanvasHeight = 800;
-    let bookNum = 5;
+    let threadOfWords = new Object();
+    let bookNum = 0;
+    let sel;
 
     p5.setup = function() {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
         p5.background(0);
+        p5.textAlign(p5.CENTER);
+        sel = p5.createSelect();
+        sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
         getBookDatas(userId)
             .then(async (bookDatas) => {
                 let i = 0;
@@ -28,35 +31,40 @@ const sketch = function(p5) {
                     };
                     const threads = new Threads(p5, book);
                     await threads.initialize();
-                    threadsOfKnowledge[i] = threads;
+                    threadOfWords[title] = threads;
+                    sel.option(title);
+                    sel.center('horizontal');
                     i++;
                 }
                 bookNum = i;
-                p5.createCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
             });
-        p5.textAlign(p5.CENTER);
-        const sel = p5.createSelect();
-        sel.position(10, 10);
-        sel.option('pear');
-        sel.option('kiwi');
-        sel.option('grape');
     }
 
     p5.draw = function() {
         p5.background(0);
-        for(let i in threadsOfKnowledge) {
-            threadsOfKnowledge[i].render();
+        //for(let title in threadsOfKnowledge) {
+            //threadsOfKnowledge[title].render();
+        //}
+        if (sel.value().length > 0 && Object.entries(threadOfWords).length > 0) {
+            threadOfWords[sel.value()].render();
         }
     }
 
     p5.windowResized = function() {
-        p5.resizeCanvas(p5.windowWidth, threadsCanvasHeight * bookNum);
+        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
         p5.background(0);
+        sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
+        sel.center('horizontal');
+        for (const title in threadOfWords) {
+            for (const thread of threadOfWords[title].threads) {
+                thread.yaxis = p5.windowHeight/2;
+            }
+        }
     }
 
     p5.mousePressed = function() {
-        for(let i in threadsOfKnowledge) {
-            threadsOfKnowledge[i].clicked(p5.mouseX, p5.mouseY);
+        for (let title in threadOfWords) {
+            threadOfWords[title].clicked(p5.mouseX, p5.mouseY);
         }
     }
 }

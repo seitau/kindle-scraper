@@ -18,7 +18,8 @@ export default class Threads {
                 //period: 200,
                 period: line.length * 50,
                 color: colorScale(p5.random(1)),
-                yaxis: 400 * book.index + 200,
+                //yaxis: 400 * book.index + 200,
+                yaxis: p5.windowHeight/2,
             }
             const thread = new Thread(p5, param);
             this.threads.push(thread);
