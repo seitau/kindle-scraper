@@ -2,51 +2,11 @@ html, body, div {
     height: 100%;
 }
 
+html {
+    background-color: black;
+}
+
 body {
     padding: 0;
     margin: 0;
 }
-
-/* ------------------------------
-   loopSlider
------------------------------- */
-.loopSliderWrap {
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    /*overflow: hidden;*/
-    position: absolute;
-}
- 
-.loopSlider {
-    margin: 0 auto;
-    height: 100%;
-    text-align: left;
-    position: relative;
-    overflow-y: visible;
-    overflow-x: hidden;
-}
-.loopSlider ul {
-    /*width: 100px;*/
-    /*height: 100px;*/
-    /*float: left;*/
-    /*overflow: hidden;*/
-}
- 
-.loopSlider ul li {
-    height: 100%;
-    /*float: left;*/
-    display: inline;
-    overflow: hidden;
-}
- 
-/* ------------------------------
-   CLEARFIX ELEMENTS
------------------------------- */
-.loopSliderWrap:after {
-    content: "";
-    display: none;
-    clear: none;
-}
-

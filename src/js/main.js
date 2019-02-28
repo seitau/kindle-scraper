@@ -15,6 +15,11 @@ const sketch = function(p5) {
         p5.textAlign(p5.CENTER);
         sel = p5.createSelect();
         sel.position(p5.windowWidth/2, p5.windowHeight/2 + 200);
+        sel.changed(async () => {
+            if (!threadOfWords[sel.value()].initialized) {
+                await threadOfWords[sel.value()].initialize();
+            }
+        });
 
         const bookDatas = await getBookDatas(userId);
         let i = 0;
@@ -30,7 +35,6 @@ const sketch = function(p5) {
                 index: i,
             };
             const threads = new Threads(p5, book);
-            await threads.initialize();
             threadOfWords[title] = threads;
             i++;
         }
@@ -41,13 +45,14 @@ const sketch = function(p5) {
         bookNum = i;
     }
 
-    p5.draw = function() {
+    p5.draw = async function() {
         p5.background(0);
-        //for(let title in threadsOfKnowledge) {
-            //threadsOfKnowledge[title].render();
-        //}
-        if (sel.value().length > 0 && Object.entries(threadOfWords).length > 0) {
-            threadOfWords[sel.value()].render();
+        if (Object.entries(threadOfWords).length > 0) {
+            if (threadOfWords[sel.value()].initialized) {
+                threadOfWords[sel.value()].render();
+            } else {
+                threadOfWords[sel.value()].initialize();
+            }
         }
     }
 

@@ -5,6 +5,7 @@ export default class Threads {
     constructor(p5, book) {
         this.p5 = p5;
         this.threads = new Array();
+        this.initialized = false;
         const lines = book.lines;
         for (const line of book.lines) {
             const param = {
@@ -27,6 +28,7 @@ export default class Threads {
     }
 
     async initialize() {
+        this.initialized = true;
         for(const thread of this.threads) {
             await thread.initialize();
         }

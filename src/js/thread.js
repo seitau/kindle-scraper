@@ -12,6 +12,8 @@ export default class Thread {
         this.circles = new Array();
         this.radius = 5;
         this.tags = new Array();
+        this.yvalues = new Array();
+        this.color = 0;
     }
 
     calculateWave() {
