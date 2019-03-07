@@ -2,6 +2,10 @@ import axios from 'axios';
 const analyzeLanguageApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/AnalyzeLanguage';
 const parseMorphemeApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/parse_morpheme';
 
+function isAlphabet(text) {
+    return ;
+} 
+
 export default class Thread {
     constructor(p5, param) {
         this.p5 = p5;
@@ -46,6 +50,7 @@ export default class Thread {
     }
 
     async analyze() {
+
         try {
             const analysisResponse = await axios.post(analyzeLanguageApiEndpoint, {
                 userId: this.userId,
@@ -59,12 +64,16 @@ export default class Thread {
             console.error('Error analyzing thread: ' + err);
         }
 
-        const parseResponse = await axios.post(parseMorphemeApiEndpoint, {
-            text: this.line.replace(/\s+/g, ''),
-        }).catch((err) => {
-            console.error('Error parsing text: ' + err);
-        });
-        console.log(parseResponse)
+        this.morphemes = this.tags;
+        if (/[a-zA-Z]/.test(this.line)) {
+            const parseResponse = await axios.post(parseMorphemeApiEndpoint, {
+                text: this.line.replace(/\s+|\,|\./g, ''),
+            }).catch((err) => {
+                console.error('Error parsing text: ' + err);
+            });
+            this.morphemes = parseResponse.data.result;
+        }
+        console.log(this.morphemes)
     }
 
     render() {

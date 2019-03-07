@@ -37,8 +37,11 @@ export default firebase.functions.https.onRequest((req, res) => {
                 return res.status(500).json({ error: err });
             });
         const lineData = lineDoc.data();
-        if (lineData.hasOwnProperty('tags')) {
-            return res.status(200).json({ result: lineData.tags });
+        if (lineData.hasOwnProperty('tags') && lineData.hasOwnProperty('contents')) {
+            return res.status(200).json({ result: {
+                tags: lineData.tags,
+                contents: lineData.contents,
+            }});
         }
         const document = {
             content: params.line,
@@ -47,13 +50,19 @@ export default firebase.functions.https.onRequest((req, res) => {
         try {
             const [ syntax ] = await client.analyzeSyntax({ document });
             const tags = new Array();
+            const contents = new Array();
             syntax.tokens.forEach(part => {
                 tags.push(part.partOfSpeech.tag);
+                contents.push(part.text.content);
             });
             await bookRef.collection('lines').doc(params.line).update({
                 tags: tags,
+                contents: contents,
             })
-            return res.status(200).json({ result: tags });
+            return res.status(200).json({ result: {
+                tags: tags,
+                contents: contents,
+            }});
         } catch (err) {
             return res.status(500).json({ error: err });
         }
