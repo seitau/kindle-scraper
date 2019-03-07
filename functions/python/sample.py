@@ -8,7 +8,7 @@
 #     print(word.morphemes)
 #
 # def parseMorpheme(request):
-#     return 'Hello World'
+#
 
 if __name__ == "__main__":
     from polyglot.text import Text, Word
