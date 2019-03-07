@@ -58,13 +58,13 @@ export default class Thread {
                 line: this.line,
             });
             if (analysisResponse.status === 200) {
-                this.tags = analysisResponse.data.result;
+                this.tags = analysisResponse.data.result.tags;
+                this.morphemes = analysisResponse.data.result.contents;
             }
         } catch (err) {
             console.error('Error analyzing thread: ' + err);
         }
 
-        this.morphemes = this.tags;
         if (/[a-zA-Z]/.test(this.line)) {
             const parseResponse = await axios.post(parseMorphemeApiEndpoint, {
                 text: this.line.replace(/\s+|\,|\./g, ''),
@@ -73,7 +73,6 @@ export default class Thread {
             });
             this.morphemes = parseResponse.data.result;
         }
-        console.log(this.morphemes)
     }
 
     render() {
