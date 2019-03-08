@@ -11,4 +11,17 @@ export async function getBookData(userId, title) {
     return linesData;
 }
 
+export async function getBookTitles(userId) {
+    const userRef = firebase.firestore().collection('users').doc(userId);
+    const booksRef = userRef.collection('books');
+    const books = await booksRef.get();
+    let titles = new Array();
+    books.forEach((book) => {
+        const title = book.data().title;
+        titles.push(title);
+    });
+    return titles;
+}
+
+
 

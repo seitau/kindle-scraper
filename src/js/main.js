@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import Threads from './threads';
-import { colorScale } from './helpers';
+import { colorScale, getBookTitles } from './helpers';
 
 const sketch = function(p5) {
     const color = colorScale;
@@ -59,14 +59,6 @@ const sketch = function(p5) {
             }
         } else {
             select.hide();
-            //p5.fill('white');
-            //p5.rect(p5.windowWidth/4, p5.windowHeight/2, p5.windowWidth/2, 50, 5);
-            //p5.noStroke();
-            //p5.fill(color(0.49));
-            //const max = p5.windowWidth/2-10;
-            //const percentage = loadingPercentage/100
-            //p5.rect(p5.windowWidth/4+5, p5.windowHeight/2+5, max*percentage, 40, 5);
-
             p5.fill('yellow');
             p5.text('Loading ...🤔', p5.windowWidth/2, p5.windowHeight/2);
             p5.textSize(40);
@@ -93,19 +85,6 @@ const sketch = function(p5) {
             threadOfWords[title].clicked(p5.mouseX, p5.mouseY);
         }
     }
-
-    async function getBookTitles(userId) {
-        const userRef = firebase.firestore().collection('users').doc(userId);
-        const booksRef = userRef.collection('books');
-        const books = await booksRef.get();
-        let titles = new Array();
-        books.forEach((book) => {
-            const title = book.data().title;
-            titles.push(title);
-        });
-        return titles;
-    }
-
 }
 
 new p5(sketch)
