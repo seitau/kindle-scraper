@@ -14,7 +14,7 @@ const sketch = function(p5) {
         this.textFont('Helvetica');
         this.textAlign(p5.CENTER, p5.TOP);
     }
-    let userId;
+    let userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
     let threadOfWords = new Object();
     let doms = new Object();
 
@@ -52,14 +52,11 @@ const sketch = function(p5) {
             dom.elem.center('horizontal');
         }
 
-        select.changed(async () => {
-            if (!threadOfWords[select.value()].initialized) {
-                await threadOfWords[select.value()].initialize();
-            }
+        scrape.mousePressed(() => {
+            console.log(email.value());
+            console.log(password.value());
+            console.log(password.value());
         });
-        //scrape.input(() => {
-            userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
-        //});
 
         const bookTitles = await getBookTitles(userId);
 
