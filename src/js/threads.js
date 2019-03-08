@@ -1,11 +1,21 @@
 import Thread from './thread';
-import { colorScale } from './helpers';
+import { colorScale, getBookData } from './helpers';
 
 export default class Threads {
     constructor(p5, book) {
         this.p5 = p5;
         this.threads = new Array();
         this.initialized = false;
+        this.lines = null;
+    }
+
+    async initialize() {
+        this.initialized = true;
+        if (this.lines === null) {
+            const lines = await getBookData(this.userId, this.title);
+            this.lines = lines;
+        }
+
         const lines = book.lines;
         for (const line of book.lines) {
             const param = {
@@ -25,10 +35,7 @@ export default class Threads {
             const thread = new Thread(p5, param);
             this.threads.push(thread);
         }
-    }
 
-    async initialize() {
-        this.initialized = true;
         for(const thread of this.threads) {
             await thread.initialize();
         }

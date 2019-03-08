@@ -2,16 +2,14 @@ import axios from 'axios';
 const analyzeLanguageApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/AnalyzeLanguage';
 const parseMorphemeApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/parse_morpheme';
 
-function isAlphabet(text) {
-    return ;
-} 
-
 export default class Thread {
     constructor(p5, param) {
         this.p5 = p5;
         this.userId = param.userId;
-        this.book = param.title;
+
+        this.title = param.title;
         this.line = param.line;
+
         this.param = param;
         this.width = p5.windowWidth;
         this.circles = new Array();
@@ -54,7 +52,7 @@ export default class Thread {
         try {
             const analysisResponse = await axios.post(analyzeLanguageApiEndpoint, {
                 userId: this.userId,
-                book: this.book,
+                book: this.title,
                 line: this.line,
             });
             if (analysisResponse.status === 200) {
