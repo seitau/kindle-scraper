@@ -33,7 +33,7 @@ export default class Threads {
                 period: line.length * 50,
                 color: colorScale(p5.random(1)),
                 //yaxis: 400 * book.index + 200,
-                yaxis: p5.windowHeight/2,
+                yaxis: p5.windowHeight/3,
             }
             const thread = new Thread(p5, param);
             this.threads.push(thread);
@@ -51,7 +51,7 @@ export default class Threads {
         if (this.lines !== null && this.threads.length === 0) {
             const p5 = this.p5;
             p5.fill('yellow');
-            p5.text('Sorry 😅. No highlighted part found in this book.', p5.windowWidth/2, p5.windowHeight/2);
+            p5.text('Sorry 😅. No highlighted part found in this book.', p5.windowWidth/2, p5.windowHeight/3);
             p5.textSize(40);
             p5.textStyle(p5.BOLD);
             p5.textFont('Helvetica');
