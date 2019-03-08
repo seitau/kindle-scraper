@@ -103,7 +103,7 @@ export default class Thread {
 
     fullScreen() {
         this.width = this.p5.windowWidth;
-        this.yaxis = this.p5.windowHeight / 2;
+        this.yaxis = this.p5.baseHeight;
         const newArrayLength = this.p5.floor(this.width / this.xspacing);
         if (newArrayLength !== Infinity) {
             this.yvalues = new Array(newArrayLength);

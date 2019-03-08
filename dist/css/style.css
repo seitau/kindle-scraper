@@ -12,3 +12,27 @@ body {
     margin: 0;
 }
 
+input[type=button] {
+  display: inline-block;
+  text-decoration: none;
+  background: #668ad8;
+  color: #FFF;
+  border-bottom: solid 4px #627295;
+  border-radius: 3px;
+  font-size: 15px;
+}
+
+input[type=button]:active {
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);
+  border-bottom: none;
+}
+
+input[type=text], input[type=password], select {
+    height: 30px;
+    border-radius: 5px;
+}
+
+input[type=text], input[type=password] {
+    width: 300px;
+}

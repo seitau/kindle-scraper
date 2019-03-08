@@ -16,31 +16,34 @@ const sketch = function(p5) {
         const select = p5.createSelect();
         const email = p5.createInput('', 'text');
         const password = p5.createInput('', 'password');
+        const scrape = p5.createInput('scrape!!');
         doms['select'] = {
             elem: select,
             offset: 200,
         };
+
         doms['email'] = {
             elem: email,
-            offset: 250,
+            offset: 260,
         };
+        email.attribute('placeholder', ' email address for amazon account');
+
         doms['password'] = {
             elem: password,
-            offset: 295,
+            offset: 305,
         };
+        password.attribute('placeholder', ' password for amazon account');
+
+        doms['scrape'] = {
+            elem: scrape,
+            offset: 350,
+        };
+        scrape.attribute('type', 'button');
+
         for (const [ propName, dom ] of Object.entries(doms)) {
-            dom.elem.style('height', '30px');
-            dom.elem.style('line-height', '35px');
             dom.elem.position(p5.halfWindowWidth, p5.baseHeight + dom.offset);
-            dom.elem.style('border-radius', '5px');
             dom.elem.center('horizontal');
         }
-        email.style('width', '300px');
-        email.attribute('placeholder', ' email address for amazon account');
-        email.center('horizontal');
-        password.style('width', '300px');
-        password.attribute('placeholder', ' password for amazon account');
-        password.center('horizontal');
 
         select.changed(async () => {
             if (!threadOfWords[select.value()].initialized) {
