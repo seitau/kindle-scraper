@@ -26,11 +26,11 @@ const sketch = function(p5) {
         loadingPercentage += 10;
 
         for (const title of bookTitles) {
-            const book = {
+            const param = {
                 userId: userId,
                 title: title,
             };
-            const threads = new Threads(p5, book);
+            const threads = new Threads(p5, param);
             threadOfWords[title] = threads;
 
             sel.option(title);
