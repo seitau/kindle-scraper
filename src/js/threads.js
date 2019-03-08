@@ -49,13 +49,13 @@ export default class Threads {
             thread.render();
         }
         if (this.lines !== null && this.threads.length === 0) {
-            const p5 = this.p5;
-            p5.fill('yellow');
-            p5.text('Sorry 😅. No highlighted part found in this book.', p5.windowWidth/2, p5.windowHeight/3);
-            p5.textSize(40);
-            p5.textStyle(p5.BOLD);
-            p5.textFont('Helvetica');
-            p5.textAlign(p5.CENTER, p5.TOP);
+            this.p5.showMessage('Sorry 😅. No highlighted part found in this book.');
+            //p5.fill('yellow');
+            //p5.text(, p5.windowWidth/2, p5.windowHeight/3);
+            //p5.textSize(40);
+            //p5.textStyle(p5.BOLD);
+            //p5.textFont('Helvetica');
+            //p5.textAlign(p5.CENTER, p5.TOP);
         }
     }
 

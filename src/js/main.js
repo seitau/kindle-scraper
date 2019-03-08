@@ -1,11 +1,20 @@
 import 'babel-polyfill';
 import Threads from './threads';
 import { getBookTitles } from './helpers';
-const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+import { sha256 } from 'js-sha256';
 
 const sketch = function(p5) {
     p5.halfWindowWidth = p5.windowWidth/2;
     p5.baseHeight = p5.windowHeight/3;
+    p5.showMessage = function(message) {
+        this.fill('yellow');
+        this.text(message, p5.halfWindowWidth, p5.baseHeight);
+        this.textSize(40);
+        this.textStyle(p5.BOLD);
+        this.textFont('Helvetica');
+        this.textAlign(p5.CENTER, p5.TOP);
+    }
+    let userId;
     let threadOfWords = new Object();
     let doms = new Object();
 
@@ -21,23 +30,21 @@ const sketch = function(p5) {
             elem: select,
             offset: 200,
         };
-
         doms['email'] = {
             elem: email,
             offset: 260,
         };
-        email.attribute('placeholder', ' email address for amazon account');
-
         doms['password'] = {
             elem: password,
             offset: 305,
         };
-        password.attribute('placeholder', ' password for amazon account');
-
         doms['scrape'] = {
             elem: scrape,
             offset: 350,
         };
+
+        email.attribute('placeholder', ' email address for amazon account');
+        password.attribute('placeholder', ' password for amazon account');
         scrape.attribute('type', 'button');
 
         for (const [ propName, dom ] of Object.entries(doms)) {
@@ -50,6 +57,9 @@ const sketch = function(p5) {
                 await threadOfWords[select.value()].initialize();
             }
         });
+        //scrape.input(() => {
+            userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+        //});
 
         const bookTitles = await getBookTitles(userId);
 
@@ -80,12 +90,7 @@ const sketch = function(p5) {
             }
         } else {
             select.elem.hide();
-            p5.fill('yellow');
-            p5.text('Loading ...🤔', p5.halfWindowWidth, p5.baseHeight);
-            p5.textSize(40);
-            p5.textStyle(p5.BOLD);
-            p5.textFont('Helvetica');
-            p5.textAlign(p5.CENTER, p5.TOP);
+            p5.showMessage('Loading ...🤔');
         }
     }
 
