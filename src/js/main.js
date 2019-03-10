@@ -18,28 +18,27 @@ const sketch = function(p5) {
     }
     let threadOfWords = new Object();
     let doms = new Object();
-    let bookNum = 0;
     let errorMessage = '';
     let userId = '';
     let userIdSet = false;
-    function () {
 
-        if (Object.keys(threadOfWords).length === 0) {
-            const bookTitles = await getBookTitles(userId);
-            bookNum = bookTitles.length;
+    async function getBookData(userId) {
+        const bookTitles = await getBookTitles(userId);
+          .catch((err) => {
+              console.error('Error getting book Data: ' + err);
+          });
 
-            for (const title of bookTitles) {
-                const param = {
-                    userId: userId,
-                    title: title,
-                };
-                const threads = new Threads(p5, param);
-                threadOfWords[title] = threads;
+        for (const title of bookTitles) {
+            const param = {
+                userId: userId,
+                title: title,
+            };
+            const threads = new Threads(p5, param);
+            threadOfWords[title] = threads;
 
-        console.log(title);
-                select.elem.option(title);
-                select.elem.center('horizontal');
-            }
+            doms['select'].elem.option(title);
+            doms['select'].elem.center('horizontal');
+        }
     }
 
     p5.setup = async function() {
@@ -81,7 +80,7 @@ const sketch = function(p5) {
             errorMessage = '';
         });
 
-        scrape.mousePressed(() => {
+        scrape.mousePressed(async () => {
             const emailVal = email.value();
             const passwordVal = password.value();
             if (emailVal.length <= 0 || passwordVal === '') {
@@ -89,7 +88,7 @@ const sketch = function(p5) {
                 return
             }
             userId = sha256(emailVal + passwordVal);
-            console.log(userId)
+            await getBookData(userId);
         });
 
     }
