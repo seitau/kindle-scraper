@@ -111,12 +111,12 @@ const sketch = function(p5) {
     p5.draw = async function() {
         p5.background(0);
         const select = doms['select'];
+        select.elem.hide();
 
         if (errorMessage !== '') {
             p5.showMessage(errorMessage);
             return
         } else if (userId === '') {
-            select.elem.hide();
             p5.showMessage('You need to submit email address and password for scraping 🙇');
             return
         }  
@@ -133,7 +133,6 @@ const sketch = function(p5) {
         } else if (scraped) {
             p5.showMessage('Could not find any books on your kindle');
         } else {
-            select.elem.hide();
             p5.showMessage('Loading ...🤔');
 
         }

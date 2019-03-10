@@ -15,7 +15,7 @@ export default firebase.functions
             return res.status(400).json({ error: "Error scraping kindle: request has to be post method" });
         }
 
-        const KindleScraper = require('./common/kindle-scraper').default;
+        const KindleScraper = require('../common/kindle-scraper').default;
         const puppeteer = require('puppeteer');
         const body = req.body;
         if (!body.hasOwnProperty('email') || !body.hasOwnProperty('password')) {
