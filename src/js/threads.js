@@ -1,5 +1,5 @@
 import Thread from './thread';
-import { colorScale, getBookData } from './helpers';
+import { colorScale, getBookLines } from './helpers';
 
 export default class Threads {
     constructor(p5, param) {
@@ -16,7 +16,7 @@ export default class Threads {
 
         this.initialized = true;
         if (this.lines === null) {
-            const lines = await getBookData(this.userId, this.title);
+            const lines = await getBookLines(this.userId, this.title);
             this.lines = lines;
         }
 
@@ -50,12 +50,6 @@ export default class Threads {
         }
         if (this.lines !== null && this.threads.length === 0) {
             this.p5.showMessage('Sorry 😅. No highlighted part found in this book.');
-            //p5.fill('yellow');
-            //p5.text(, p5.windowWidth/2, p5.windowHeight/3);
-            //p5.textSize(40);
-            //p5.textStyle(p5.BOLD);
-            //p5.textFont('Helvetica');
-            //p5.textAlign(p5.CENTER, p5.TOP);
         }
     }
 

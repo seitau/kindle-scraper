@@ -2,11 +2,13 @@ import 'babel-polyfill';
 import Threads from './threads';
 import { getBookTitles } from './helpers';
 import { sha256 } from 'js-sha256';
+//const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 
 const sketch = function(p5) {
     p5.halfWindowWidth = p5.windowWidth/2;
     p5.baseHeight = p5.windowHeight/3;
     p5.showMessage = function(message) {
+        this.background(0)
         this.fill('yellow');
         this.text(message, p5.halfWindowWidth, p5.baseHeight);
         this.textSize(40);
@@ -14,9 +16,31 @@ const sketch = function(p5) {
         this.textFont('Helvetica');
         this.textAlign(p5.CENTER, p5.TOP);
     }
-    let userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
     let threadOfWords = new Object();
     let doms = new Object();
+    let bookNum = 0;
+    let errorMessage = '';
+    let userId = '';
+    let userIdSet = false;
+    function () {
+
+        if (Object.keys(threadOfWords).length === 0) {
+            const bookTitles = await getBookTitles(userId);
+            bookNum = bookTitles.length;
+
+            for (const title of bookTitles) {
+                const param = {
+                    userId: userId,
+                    title: title,
+                };
+                const threads = new Threads(p5, param);
+                threadOfWords[title] = threads;
+
+        console.log(title);
+                select.elem.option(title);
+                select.elem.center('horizontal');
+            }
+    }
 
     p5.setup = async function() {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
@@ -52,31 +76,38 @@ const sketch = function(p5) {
             dom.elem.center('horizontal');
         }
 
-        scrape.mousePressed(() => {
-            console.log(email.value());
-            console.log(password.value());
-            console.log(password.value());
+
+        select.changed(() => {
+            errorMessage = '';
         });
 
-        const bookTitles = await getBookTitles(userId);
+        scrape.mousePressed(() => {
+            const emailVal = email.value();
+            const passwordVal = password.value();
+            if (emailVal.length <= 0 || passwordVal === '') {
+                errorMessage = 'Please provide email and password 🙇';
+                return
+            }
+            userId = sha256(emailVal + passwordVal);
+            console.log(userId)
+        });
 
-        for (const title of bookTitles) {
-            const param = {
-                userId: userId,
-                title: title,
-            };
-            const threads = new Threads(p5, param);
-            threadOfWords[title] = threads;
-
-            select.option(title);
-            select.center('horizontal');
-        }
     }
 
     p5.draw = async function() {
         p5.background(0);
         const select = doms['select'];
-        if (Object.entries(threadOfWords).length > 0) {
+
+        if (errorMessage !== '') {
+            p5.showMessage(errorMessage);
+            return
+        } else if (userId === '') {
+            select.elem.hide();
+            p5.showMessage('You need to submit email and password for scraping 🙇');
+            return
+        }  
+
+        if (Object.keys(threadOfWords).length > 0) {
             select.elem.show();
             select.elem.position(p5.halfWindowWidth, p5.baseHeight + select.offset);
             select.elem.center('horizontal');
@@ -87,7 +118,7 @@ const sketch = function(p5) {
             }
         } else {
             select.elem.hide();
-            p5.showMessage('Loading ...🤔');
+            p5.showMessage('loading ...🤔');
         }
     }
 
