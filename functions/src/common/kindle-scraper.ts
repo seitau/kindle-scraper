@@ -1,6 +1,7 @@
 import firebase from './firebase';
 import { sha256 } from 'js-sha256';
-const amazonKindleUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
+const amazonKindleJapanUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
+const amazonKindleUnitedStatesUrl = 'https://read.amazon.com/notebook?ref_=kcr_notebook_lib';
 const pc = {
     name: 'Desktop 1920x1080',
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Safari/537.36',
@@ -18,6 +19,7 @@ export default class {
     amazonPassword: any;
     userId: any;
     scrapeAll: any;
+    amazonKindleUrl: any;
     additionalPageNum: any;
     userRef: any;
 
@@ -29,6 +31,7 @@ export default class {
         this.amazonPassword = amazonPassword;
         this.userId = sha256(amazonEmail + amazonPassword);
         this.scrapeAll = options.scrapeAll === undefined ? false : options.scrapeAll;
+        this.amazonKindleUrl = options.amazonJapan === undefined ? amazonKindleJapanUrl : amazonKindleUnitedStatesUrl;
         this.additionalPageNum = options.additionalPageNum === undefined ? 2 : options.additionalPageNum;
     }
 
@@ -55,7 +58,7 @@ export default class {
         }
 
         console.log('Opening amazon kindle website');
-        await page.goto(amazonKindleUrl, {waitUntil: 'load'});
+        await page.goto(this.amazonKindleUrl, {waitUntil: 'load'});
 
         const password_input = await page.$('#ap_password');
         if(password_input !== null) {
@@ -193,7 +196,7 @@ export default class {
         for (let i = 0; i < this.additionalPageNum; i++) {
             const newPage = await browser.newPage();
             newPage.num = i + 1;
-            await newPage.goto(amazonKindleUrl);
+            await newPage.goto(this.amazonKindleUrl);
             pages.push(newPage)
         }
 
