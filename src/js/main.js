@@ -18,12 +18,12 @@ const sketch = function(p5) {
     }
     let threadOfWords = new Object();
     let doms = new Object();
+    let scraped = false;
     let errorMessage = '';
     let userId = '';
-    let userIdSet = false;
 
     async function getBookData(userId) {
-        const bookTitles = await getBookTitles(userId);
+        const bookTitles = await getBookTitles(userId)
           .catch((err) => {
               console.error('Error getting book Data: ' + err);
           });
@@ -39,11 +39,21 @@ const sketch = function(p5) {
             doms['select'].elem.option(title);
             doms['select'].elem.center('horizontal');
         }
+        scraped = true;
     }
 
-    p5.setup = async function() {
-        p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        p5.background(0);
+    async function clearData() {
+        threadOfWords = new Object();
+        scraped = false;
+        errorMessage = '';
+        userId = '';
+        await initializeDoms();
+    }
+
+    async function initializeDoms() {
+        for (const key in doms) {
+            doms[key].elem.remove();
+        }
 
         const select = p5.createSelect();
         const email = p5.createInput('', 'text');
@@ -75,22 +85,27 @@ const sketch = function(p5) {
             dom.elem.center('horizontal');
         }
 
-
         select.changed(() => {
             errorMessage = '';
         });
 
         scrape.mousePressed(async () => {
+            await clearData();
             const emailVal = email.value();
             const passwordVal = password.value();
             if (emailVal.length <= 0 || passwordVal === '') {
-                errorMessage = 'Please provide email and password 🙇';
+                errorMessage = 'Please provide email address and password 🙇';
                 return
             }
             userId = sha256(emailVal + passwordVal);
             await getBookData(userId);
         });
+    }
 
+    p5.setup = async function() {
+        p5.createCanvas(p5.windowWidth, p5.windowHeight);
+        p5.background(0);
+        await initializeDoms();
     }
 
     p5.draw = async function() {
@@ -102,7 +117,7 @@ const sketch = function(p5) {
             return
         } else if (userId === '') {
             select.elem.hide();
-            p5.showMessage('You need to submit email and password for scraping 🙇');
+            p5.showMessage('You need to submit email address and password for scraping 🙇');
             return
         }  
 
@@ -115,9 +130,12 @@ const sketch = function(p5) {
             } else {
                 threadOfWords[select.elem.value()].initialize();
             }
+        } else if (scraped) {
+            p5.showMessage('Could not find any books on your kindle');
         } else {
             select.elem.hide();
-            p5.showMessage('loading ...🤔');
+            p5.showMessage('Loading ...🤔');
+
         }
     }
 
