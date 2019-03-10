@@ -27,6 +27,9 @@ export default firebase.functions
         if (body.hasOwnProperty('scrapeAll')) {
             options['scrapeAll'] = body.scrapeAll;
         };
+        if (body.hasOwnProperty('amazonJapan')) {
+            options['amazonJapan'] = body.amazonJapan;
+        };
         const browser = await puppeteer.launch({
             headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
