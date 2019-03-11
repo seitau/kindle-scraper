@@ -1,4 +1,5 @@
 import firebase from './firebase';
+import moment from 'moment';
 import { sha256 } from 'js-sha256';
 const amazonKindleJapanUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
 const amazonKindleUnitedStatesUrl = 'https://read.amazon.com/notebook?ref_=kcr_notebook_lib';
@@ -81,6 +82,15 @@ export default class {
             await page.type('#ap_email', this.amazonEmail);
         }
 
+        //const buffer = await page.screenshot({fullPage: true});
+        //const storageRef = firebase.storage().ref();
+        //const now = moment().format('DD-MMM-YYYY');
+        //const imagesRef = storageRef.child(`images/${now}.jpg`);
+        //const image = new Blob([new Uint8Array(buffer)]);
+        //imagesRef.put(image).then((snapshot) => {
+            //console.log('Uploaded a screenshot');
+        //});
+
         console.log('Submitting form');
         await page.click('#signInSubmit');
     }
@@ -120,7 +130,7 @@ export default class {
             return img.getAttribute('src').replace(/\._SY160/, '');
         });
 
-        console.log('scraping on page ' + page.num + ': ' + title);
+        console.log('Scraping on page ' + page.num + ': ' + title);
 
         await page.click(`#` + id)
         await page.waitForSelector('.kp-notebook-annotation-container')
@@ -153,6 +163,10 @@ export default class {
     }
 
     async scrapeBooks(page, books) {
+        if (books.length === 0) {
+            return Promise.resolve([]);
+        }
+
         const bookDatas = new Array();
         for (const book of books) {
             bookDatas.push(await this.scrapeBook(page, book))
@@ -203,25 +217,37 @@ export default class {
         const pagesNum = pages.length;
         const additionalNum = books.length % pagesNum;
         const iterationNum = (books.length - additionalNum) / pagesNum;
-        if (iterationNum <= 0 && additionalNum === books.length) {
-            console.error('books number too low');
-        }
+
         const booksMap = new Object();
         for (let i = 0; i < pages.length; i++) {
             booksMap[i] = new Array();
         }
+
         for (let i = 0; i < iterationNum; i++) {
             for (let j = 0; j < pages.length; j++) {
                 booksMap[j].push(books[i + iterationNum * j]);
             }
         }
-        for (let i = 0; i < additionalNum; i++) {
-            booksMap[i].push(books[pagesNum * iterationNum + i]);
+
+        //booksNumがpageNumより小さい場合
+        if (iterationNum <= 0 && additionalNum === books.length) {
+            for (let i = 0; i < additionalNum; i++) {
+                booksMap[i].push(books[i]);
+            }
+        } else {
+            for (let i = 0; i < additionalNum; i++) {
+                booksMap[i].push(books[pagesNum * iterationNum + i]);
+            }
         }
+
         try {
             const bookDatasList = await Promise.all(
                 await this.scrapeBooksParallelly(booksMap)
             );
+
+            console.log('Scraping finished'); 
+
+            console.log('Storing into database'); 
             let bookDatas = new Array();
             for (const booksList of bookDatasList) {
                 bookDatas = bookDatas.concat(booksList);

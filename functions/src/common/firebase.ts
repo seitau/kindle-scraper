@@ -9,7 +9,8 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: "gs://kindle-7ef16.appspot.com/",
 });
 const db = admin.firestore()
 

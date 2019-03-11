@@ -31,7 +31,7 @@ export default firebase.functions
             options['amazonJapan'] = body.amazonJapan;
         };
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage();
