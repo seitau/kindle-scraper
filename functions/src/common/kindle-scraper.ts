@@ -82,6 +82,7 @@ export default class {
             await page.type('#ap_email', this.amazonEmail);
         }
 
+<<<<<<< HEAD
         //const buffer = await page.screenshot({fullPage: true});
         //const storageRef = firebase.storage().ref();
         //const now = moment().format('DD-MMM-YYYY');
@@ -90,6 +91,16 @@ export default class {
         //imagesRef.put(image).then((snapshot) => {
             //console.log('Uploaded a screenshot');
         //});
+=======
+        const buffer = await page.screenshot({fullPage: true});
+        const storageRef = firebase.storage().ref();
+        const now = moment().format('DD-MMM-YYYY');
+        const imagesRef = storageRef.child(`images/${now}.jpg`);
+        const image = new Blob([new Uint8Array(buffer)]);
+        imagesRef.put(image).then((snapshot) => {
+            console.log('Uploaded a screenshot');
+        });
+>>>>>>>  :+1: Update:firebase.ts
 
         console.log('Submitting form');
         await page.click('#signInSubmit');
