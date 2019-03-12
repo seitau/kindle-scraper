@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import Threads from './threads';
 import { getBookTitles } from './helpers';
 import { sha256 } from 'js-sha256';
-//const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
+const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 
 const sketch = function(p5) {
     p5.halfWindowWidth = p5.windowWidth/2;
@@ -20,7 +20,7 @@ const sketch = function(p5) {
     let doms = new Object();
     let scraped = false;
     let errorMessage = '';
-    let userId = '';
+    //let userId = '';
 
     async function getBookData(userId) {
         const bookTitles = await getBookTitles(userId)
@@ -56,29 +56,29 @@ const sketch = function(p5) {
         }
 
         const select = p5.createSelect();
-        const email = p5.createInput('', 'text');
-        const password = p5.createInput('', 'password');
-        const scrape = p5.createInput('scrape!!');
+        //const email = p5.createInput('', 'text');
+        //const password = p5.createInput('', 'password');
+        //const scrape = p5.createInput('scrape!!');
         doms['select'] = {
             elem: select,
             offset: 200,
         };
-        doms['email'] = {
-            elem: email,
-            offset: 260,
-        };
-        doms['password'] = {
-            elem: password,
-            offset: 305,
-        };
-        doms['scrape'] = {
-            elem: scrape,
-            offset: 350,
-        };
+        //doms['email'] = {
+            //elem: email,
+            //offset: 260,
+        //};
+        //doms['password'] = {
+            //elem: password,
+            //offset: 305,
+        //};
+        //doms['scrape'] = {
+            //elem: scrape,
+            //offset: 350,
+        //};
 
-        email.attribute('placeholder', ' email address for amazon account');
-        password.attribute('placeholder', ' password for amazon account');
-        scrape.attribute('type', 'button');
+        //email.attribute('placeholder', ' email address for amazon account');
+        //password.attribute('placeholder', ' password for amazon account');
+        //scrape.attribute('type', 'button');
 
         for (const [ propName, dom ] of Object.entries(doms)) {
             dom.elem.position(p5.halfWindowWidth, p5.baseHeight + dom.offset);
@@ -89,17 +89,19 @@ const sketch = function(p5) {
             errorMessage = '';
         });
 
-        scrape.mousePressed(async () => {
-            await clearData();
-            const emailVal = email.value();
-            const passwordVal = password.value();
-            if (emailVal.length <= 0 || passwordVal === '') {
-                errorMessage = 'Please provide email address and password 🙇';
-                return
-            }
-            userId = sha256(emailVal + passwordVal);
-            await getBookData(userId);
-        });
+        //scrape.mousePressed(async () => {
+            //await clearData();
+            //const emailVal = email.value();
+            //const passwordVal = password.value();
+            //if (emailVal.length <= 0 || passwordVal === '') {
+                //errorMessage = 'Please provide email address and password 🙇';
+                //return
+            //}
+            //userId = sha256(emailVal + passwordVal);
+            //await getBookData(userId);
+        //});
+
+        await getBookData(userId);
     }
 
     p5.setup = async function() {
