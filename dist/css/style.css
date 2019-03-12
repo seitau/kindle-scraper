@@ -36,3 +36,23 @@ input[type=text], input[type=password], select {
 input[type=text], input[type=password] {
     width: 300px;
 }
+
+.slick {
+    height: 250px;
+    width: 500px;
+    overflow: visible;
+}
+.slick-list {
+    position: relative;
+    display: block;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    /*max-width: 1128px;*/
+}
+.slick-list img {
+    width: 300px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+

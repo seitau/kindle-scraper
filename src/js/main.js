@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import Threads from './threads';
-import { getBookTitles } from './helpers';
+import { getBookMetaData } from './helpers';
 import { sha256 } from 'js-sha256';
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 
@@ -23,12 +23,13 @@ const sketch = function(p5) {
     //let userId = '';
 
     async function getBookData(userId) {
-        const bookTitles = await getBookTitles(userId)
-          .catch((err) => {
-              console.error('Error getting book Data: ' + err);
-          });
+        const bookMetaData = await getBookMetaData(userId)
+            .catch((err) => {
+                console.error('Error getting book Data: ' + err);
+            });
 
-        for (const title of bookTitles) {
+        for (const metaData of bookMetaData) {
+            const title = metaData.title;
             const param = {
                 userId: userId,
                 title: title,
@@ -38,6 +39,9 @@ const sketch = function(p5) {
 
             doms['select'].elem.option(title);
             doms['select'].elem.center('horizontal');
+            const child = p5.createImg(metaData.image);;
+            doms['slide'].elem.child(child);
+            doms['slide'].elem.center('horizontal');
         }
         scraped = true;
     }
@@ -56,6 +60,7 @@ const sketch = function(p5) {
         }
 
         const select = p5.createSelect();
+        const slide = p5.createDiv().class('slick');
         //const email = p5.createInput('', 'text');
         //const password = p5.createInput('', 'password');
         //const scrape = p5.createInput('scrape!!');
@@ -63,17 +68,21 @@ const sketch = function(p5) {
             elem: select,
             offset: 200,
         };
+        doms['slide'] = {
+            elem: slide,
+            offset: 260,
+        };
         //doms['email'] = {
-            //elem: email,
-            //offset: 260,
+        //elem: email,
+        //offset: 260,
         //};
         //doms['password'] = {
-            //elem: password,
-            //offset: 305,
+        //elem: password,
+        //offset: 305,
         //};
         //doms['scrape'] = {
-            //elem: scrape,
-            //offset: 350,
+        //elem: scrape,
+        //offset: 350,
         //};
 
         //email.attribute('placeholder', ' email address for amazon account');
@@ -90,18 +99,25 @@ const sketch = function(p5) {
         });
 
         //scrape.mousePressed(async () => {
-            //await clearData();
-            //const emailVal = email.value();
-            //const passwordVal = password.value();
-            //if (emailVal.length <= 0 || passwordVal === '') {
-                //errorMessage = 'Please provide email address and password 🙇';
-                //return
-            //}
-            //userId = sha256(emailVal + passwordVal);
-            //await getBookData(userId);
+        //await clearData();
+        //const emailVal = email.value();
+        //const passwordVal = password.value();
+        //if (emailVal.length <= 0 || passwordVal === '') {
+        //errorMessage = 'Please provide email address and password 🙇';
+        //return
+        //}
+        //userId = sha256(emailVal + passwordVal);
+        //await getBookData(userId);
         //});
 
         await getBookData(userId);
+
+        $('.slick').slick({
+            slidesToShow: 2,
+            slidesToScroll: 3,
+            autoplay: true,
+            autoplaySpeed: 2500,
+        });
     }
 
     p5.setup = async function() {

@@ -11,16 +11,20 @@ export async function getBookLines(userId, title) {
     return linesData;
 }
 
-export async function getBookTitles(userId) {
+export async function getBookMetaData(userId) {
     const userRef = firebase.firestore().collection('users').doc(userId);
     const booksRef = userRef.collection('books');
     const books = await booksRef.get();
-    let titles = new Array();
+    let metaData = new Array();
     books.forEach((book) => {
         const title = book.data().title;
-        titles.push(title);
+        const image = book.data().book_cover_image_url;
+        metaData.push({
+            title: title,
+            image: image,
+        });
     });
-    return titles;
+    return metaData;
 }
 
 
