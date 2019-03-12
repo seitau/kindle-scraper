@@ -20,6 +20,7 @@ const sketch = function(p5) {
     let doms = new Object();
     let scraped = false;
     let errorMessage = '';
+    let selectedTitle;
     //let userId = '';
 
     async function getBookData(userId) {
@@ -37,11 +38,16 @@ const sketch = function(p5) {
             const threads = new Threads(p5, param);
             threadOfWords[title] = threads;
 
-            doms['select'].elem.option(title);
-            doms['select'].elem.center('horizontal');
-            const child = p5.createImg(metaData.image);;
+            const child = p5.createImg(metaData.image).attribute('title', title);
+            child.mousePressed(() => {
+                console.log(child.attribute('src'));
+                console.log(child.attribute('title'));
+                selectedTitle = child.attribute('title');
+                errorMessage = '';
+            });
             doms['slide'].elem.child(child);
             doms['slide'].elem.center('horizontal');
+            selectedTitle = title;
         }
         scraped = true;
     }
@@ -59,18 +65,13 @@ const sketch = function(p5) {
             doms[key].elem.remove();
         }
 
-        const select = p5.createSelect();
         const slide = p5.createDiv().class('slick');
         //const email = p5.createInput('', 'text');
         //const password = p5.createInput('', 'password');
         //const scrape = p5.createInput('scrape!!');
-        doms['select'] = {
-            elem: select,
-            offset: 200,
-        };
         doms['slide'] = {
             elem: slide,
-            offset: 260,
+            offset: 200,
         };
         //doms['email'] = {
         //elem: email,
@@ -94,10 +95,6 @@ const sketch = function(p5) {
             dom.elem.center('horizontal');
         }
 
-        select.changed(() => {
-            errorMessage = '';
-        });
-
         //scrape.mousePressed(async () => {
         //await clearData();
         //const emailVal = email.value();
@@ -114,7 +111,7 @@ const sketch = function(p5) {
 
         $('.slick').slick({
             slidesToShow: 2,
-            slidesToScroll: 3,
+            slidesToScroll: 1,
             autoplay: true,
             autoplaySpeed: 2500,
         });
@@ -128,8 +125,6 @@ const sketch = function(p5) {
 
     p5.draw = async function() {
         p5.background(0);
-        const select = doms['select'];
-        select.elem.hide();
 
         if (errorMessage !== '') {
             p5.showMessage(errorMessage);
@@ -140,25 +135,20 @@ const sketch = function(p5) {
         }  
 
         if (Object.keys(threadOfWords).length > 0) {
-            select.elem.show();
-            select.elem.position(p5.halfWindowWidth, p5.baseHeight + select.offset);
-            select.elem.center('horizontal');
-            if (threadOfWords[select.elem.value()].initialized) {
-                threadOfWords[select.elem.value()].render();
+            if (threadOfWords[selectedTitle].initialized) {
+                threadOfWords[selectedTitle].render();
             } else {
-                threadOfWords[select.elem.value()].initialize();
+                threadOfWords[selectedTitle].initialize();
             }
         } else if (scraped) {
             p5.showMessage('Could not find any books on your kindle');
         } else {
             p5.showMessage('Loading ...🤔');
-
         }
     }
 
     p5.windowResized = function() {
         p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-        p5.background(0);
         p5.halfWindowWidth = p5.windowWidth/2;
         p5.baseHeight = p5.windowHeight/3;
         for (const [ propName, dom ] of Object.entries(doms)) {
