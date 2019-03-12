@@ -1,6 +1,21 @@
 import axios from 'axios';
+import { colorScale } from './helpers';
 const analyzeLanguageApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/AnalyzeLanguage';
 const parseMorphemeApiEndpoint = 'https://us-central1-kindle-7ef16.cloudfunctions.net/parse_morpheme';
+
+function countSyntacticUnits(pos, tags) {
+    if (!tags instanceof Array) {
+        return 0;
+    }
+
+    let count = 0;
+    for (let i = 0;  i < tags.length; i++) {
+        if(tags[i] == pos){
+            count++;
+        }
+    }
+    return count;
+}
 
 export default class Thread {
     constructor(p5, param) {
@@ -36,15 +51,36 @@ export default class Thread {
         await this.analyze();
         const p5 = this.p5;
         const param = this.param;
+        //this.xspacing = param.xspacing;
+        //this.theta = param.theta;
+        //this.angularVelocity = param.angularVelocity;
+        //this.amplitude = param.amplitude;
+        //this.period = param.period;
+        //this.dx = (p5.TWO_PI / this.period) * this.xspacing 
+        //this.color = param.color;
+        //this.yaxis = param.yaxis;
+        //this.yvalues = new Array(p5.floor(this.width / this.xspacing));
+        
         this.xspacing = param.xspacing;
-        this.theta = param.theta;
+        this.theta = this.tags.length;
         this.angularVelocity = param.angularVelocity;
         this.amplitude = param.amplitude;
-        this.period = param.period;
+        this.period = this.morphemes.length * 50;
         this.dx = (p5.TWO_PI / this.period) * this.xspacing 
-        this.color = param.color;
+
+        let syntaxCount = 0;
+        syntaxCount += countSyntacticUnits('NOUN', this.tags);
+        syntaxCount += countSyntacticUnits('PUNCT', this.tags);
+        syntaxCount += countSyntacticUnits('PRON', this.tags);
+        syntaxCount += countSyntacticUnits('DET', this.tags);
+        this.color = colorScale(syntaxCount / this.tags.length);
+
         this.yaxis = param.yaxis;
         this.yvalues = new Array(p5.floor(this.width / this.xspacing));
+
+        console.log(this.tags)
+
+        console.log(syntaxCount / this.tags.length)
     }
 
     async analyze() {
