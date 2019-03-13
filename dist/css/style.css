@@ -12,6 +12,22 @@ body {
     margin: 0;
 }
 
+.book {
+    position: fixed;
+    z-index: 0;
+    display: block;
+    bottom: 0;
+    width: 100%;
+}
+
+.book img {
+    bottom: 0;
+    left:0;
+    opacity: .15;
+    position: absolute;
+    width: 100%;
+}
+
 input[type=button] {
   display: inline-block;
   text-decoration: none;
@@ -41,6 +57,7 @@ input[type=text], input[type=password] {
     height: 270px;
     width: 500px;
     overflow: visible;
+    z-index: 1;
 }
 .slick-list {
     position: relative;

@@ -115,6 +115,9 @@ const sketch = function(p5) {
             autoplay: true,
             autoplaySpeed: 2500,
         });
+
+        const background = p5.createDiv('').class('book');
+        background.child(p5.createImg("img/opened-book-png-6.png"));
     }
 
     p5.setup = async function() {
