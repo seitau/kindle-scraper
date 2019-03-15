@@ -1,5 +1,5 @@
 import firebase from './firebase';
-import moment from 'moment';
+//import moment from 'moment';
 import { sha256 } from 'js-sha256';
 const amazonKindleJapanUrl = 'https://read.amazon.co.jp/notebook?ref_=kcr_notebook_lib';
 const amazonKindleUnitedStatesUrl = 'https://read.amazon.com/notebook?ref_=kcr_notebook_lib';

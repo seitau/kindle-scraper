@@ -27,5 +27,30 @@ export async function getBookMetaData(userId) {
     return metaData;
 }
 
+export function initializeSlick() {
+    $('.slick').slick({
+        slidesToShow: 6,
+        slidesToScroll: 3,
+        swipeToSlide: true,
+        autoplay: true,
+        autoplaySpeed: 2500,
+        arrows: false,
+        respondTo: 'window',
+        responsive: [
+            {
+                breakpoint: 1024,     // 600〜1023px
+                settings: {
+                    slidesToShow: 4,
+                }
+            },
+            {
+                breakpoint: 600,      // 480〜599px
+                settings: {
+                    slidesToShow: 3,
+                }
+            },
+        ],
+    });
+}
 
 

@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import Threads from './threads';
-import { getBookMetaData } from './helpers';
+import { getBookMetaData, initializeSlick } from './helpers';
 import { sha256 } from 'js-sha256';
 const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f';
 
@@ -108,22 +108,15 @@ const sketch = function(p5) {
         //});
 
         await getBookData(userId);
-
-        $('.slick').slick({
-            slidesToShow: 2,
-            slidesToScroll: 1,
-            autoplay: true,
-            autoplaySpeed: 2500,
-        });
-
-        const background = p5.createDiv('').class('book');
-        background.child(p5.createImg("img/opened-book-png-6.png"));
     }
 
     p5.setup = async function() {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
         p5.background(0);
         await initializeDoms();
+        //const background = p5.createDiv('').class('book');
+        //background.child(p5.createImg("img/opened-book-png-6.png"));
+        initializeSlick();
     }
 
     p5.draw = async function() {
