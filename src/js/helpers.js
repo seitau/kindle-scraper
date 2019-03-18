@@ -53,4 +53,17 @@ export function initializeSlick() {
     });
 }
 
+export function countSyntacticUnits(pos, tags) {
+    if (!tags instanceof Array) {
+        return 0;
+    }
+
+    let count = 0;
+    for (let i = 0;  i < tags.length; i++) {
+        if(tags[i] == pos){
+            count++;
+        }
+    }
+    return count;
+}
 

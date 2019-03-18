@@ -21,7 +21,6 @@ const sketch = function(p5) {
     let scraped = false;
     let errorMessage = '';
     let selectedTitle;
-    //let userId = '';
 
     async function getBookData(userId) {
         const bookMetaData = await getBookMetaData(userId)
@@ -40,8 +39,6 @@ const sketch = function(p5) {
 
             const child = p5.createImg(metaData.image).attribute('title', title);
             child.mousePressed(() => {
-                console.log(child.attribute('src'));
-                console.log(child.attribute('title'));
                 selectedTitle = child.attribute('title');
                 errorMessage = '';
             });

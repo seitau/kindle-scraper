@@ -10,6 +10,8 @@ export default class Threads {
         this.userId = param.userId;
         this.title = param.title;
         this.accumDelta = 0;
+        this.clickedThread = null;
+        this.highlightedLineWidth = null;
     }
 
     async initialize() {
@@ -27,13 +29,8 @@ export default class Threads {
                 title: this.title,
                 line: line,
                 xspacing: 7,
-                theta: 0,
                 angularVelocity: 0.04,
-                amplitude: 125.0,
-                //period: 200,
-                period: line.length * 50,
-                color: colorScale(p5.random(1)),
-                //yaxis: 400 * book.index + 200,
+                amplitude: 125 + this.accumDelta,
                 yaxis: p5.windowHeight/3,
             }
             const thread = new Thread(p5, param);
@@ -49,6 +46,10 @@ export default class Threads {
         for(const thread of this.threads) {
             thread.render();
         }
+        if (this.clickedThread !== null) {
+            const thread = this.clickedThread;
+            this.showHighlightedLine(thread.line, thread.color);
+        }
         if (this.lines !== null && this.threads.length === 0) {
             this.p5.showMessage('Sorry 😅. No highlighted part found in this book.');
         }
@@ -56,7 +57,10 @@ export default class Threads {
 
     clicked(x, y) {
         for(const thread of this.threads) {
-            thread.clicked(x, y);
+            const isClicked = thread.clicked(x, y);
+            if (isClicked) {
+                this.clickedThread = thread;
+            }
         }
     }
 
@@ -71,6 +75,29 @@ export default class Threads {
         for(const thread of this.threads) {
             thread.mouseWheel(event, this.accumDelta);
         }
+    }
+
+    showHighlightedLine(line, color) {
+        const p5 = this.p5;
+        p5.fill(color);
+        const lineLength = line.length * 40;
+        if (this.highlightedLineWidth === null) {
+            this.highlightedLineWidth = lineLength + 100;
+        }
+        this.highlightedLineWidth -= 15;
+        if (this.highlightedLineWidth < lineLength * -0.8) {
+            this.highlightedLineWidth = lineLength + 100;
+        }
+        if (lineLength > p5.windowWidth) {
+            p5.text(line, this.highlightedLineWidth, p5.baseHeight+150);
+        } else {
+            p5.text(line, p5.halfWindowWidth, p5.baseHeight+150);
+        }
+        console.log(this.highlightedLineWidth)
+        p5.textSize(40);
+        p5.textStyle(p5.BOLD);
+        p5.textFont('Helvetica');
+        p5.textAlign(p5.CENTER, p5.TOP);
     }
 }
 
