@@ -9,6 +9,7 @@ export default class Threads {
         this.lines = null;
         this.userId = param.userId;
         this.title = param.title;
+        this.accumDelta = 0;
     }
 
     async initialize() {
@@ -62,6 +63,13 @@ export default class Threads {
     windowResized() {
         for(const thread of this.threads) {
             thread.fullScreen();
+        }
+    }
+
+    mouseWheel(event) {
+        this.accumDelta += event.delta;
+        for(const thread of this.threads) {
+            thread.mouseWheel(event, this.accumDelta);
         }
     }
 }

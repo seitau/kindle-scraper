@@ -71,7 +71,7 @@ const sketch = function(p5) {
         //const scrape = p5.createInput('scrape!!');
         doms['slide'] = {
             elem: slide,
-            offset: 200,
+            offset: 240,
         };
         //doms['email'] = {
         //elem: email,
@@ -159,6 +159,12 @@ const sketch = function(p5) {
     p5.mousePressed = function() {
         for (let title in threadOfWords) {
             threadOfWords[title].clicked(p5.mouseX, p5.mouseY);
+        }
+    }
+
+    p5.mouseWheel = function(event) {
+        for (let title in threadOfWords) {
+            threadOfWords[title].mouseWheel(event);
         }
     }
 }

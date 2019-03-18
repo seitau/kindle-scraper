@@ -54,7 +54,7 @@ input[type=text], input[type=password] {
 }
 
 .slick {
-    height: 250px;
+    height: 220px;
     width: 100%;
     overflow: visible;
     z-index: 1;
@@ -67,10 +67,13 @@ input[type=text], input[type=password] {
     padding: 0;
     /*max-width: 1128px;*/
 }
+.slick-list :focus {
+    outline-color: yellow;
+}
 .slick-list img {
     width: 300px;
-    margin-right: 15px;
-    margin-left: 15px;
+    margin-right: 30px;
+    margin-left: 30px;
     border-radius: 5px;
 }
 

@@ -18,6 +18,7 @@ function countSyntacticUnits(pos, tags) {
 }
 
 export default class Thread {
+
     constructor(p5, param) {
         this.p5 = p5;
         this.userId = param.userId;
@@ -73,18 +74,25 @@ export default class Thread {
         syntaxCount += countSyntacticUnits('PUNCT', this.tags);
         syntaxCount += countSyntacticUnits('PRON', this.tags);
         syntaxCount += countSyntacticUnits('DET', this.tags);
+        syntaxCount += countSyntacticUnits('NUM', this.tags);
+        syntaxCount += countSyntacticUnits('AFFIX', this.tags);
+        syntaxCount += countSyntacticUnits('ADV', this.tags);
+        syntaxCount += countSyntacticUnits('PRT', this.tags);
         this.color = colorScale(syntaxCount / this.tags.length);
 
         this.yaxis = param.yaxis;
         this.yvalues = new Array(p5.floor(this.width / this.xspacing));
 
+        //this.amplitudeが初期値で波を計算する
+        this.calculateWave();
+
         console.log(this.tags)
+        console.log(this.line)
 
         console.log(syntaxCount / this.tags.length)
     }
 
     async analyze() {
-
         try {
             const analysisResponse = await axios.post(analyzeLanguageApiEndpoint, {
                 userId: this.userId,
@@ -144,5 +152,23 @@ export default class Thread {
         if (newArrayLength !== Infinity) {
             this.yvalues = new Array(newArrayLength);
         }
+    }
+
+    mouseWheel(event, accumDelta) {
+        //this.radius += event.delta;
+        
+        const initialAmp = this.amplitude - accumDelta;
+
+        //console.log(initialAmp)
+        if (initialAmp !== 125) {
+            this.amplitude = 125 + accumDelta;
+        }
+        console.log(this.amplitude)
+
+
+        this.amplitude += event.delta;
+        //console.log(this.amplitude);
+        //this.amplitude
+        //this.dx
     }
 }
