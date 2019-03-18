@@ -50,10 +50,10 @@ export default class Thread {
 
         let syntaxCount = 0;
         syntaxCount += countSyntacticUnits('NOUN', this.tags);
-        syntaxCount += countSyntacticUnits('PUNCT', this.tags);
+        //syntaxCount += countSyntacticUnits('PUNCT', this.tags);
         syntaxCount += countSyntacticUnits('PRON', this.tags);
         syntaxCount += countSyntacticUnits('DET', this.tags);
-        syntaxCount += countSyntacticUnits('NUM', this.tags);
+        //syntaxCount += countSyntacticUnits('NUM', this.tags);
         syntaxCount += countSyntacticUnits('AFFIX', this.tags);
         syntaxCount += countSyntacticUnits('ADV', this.tags);
         syntaxCount += countSyntacticUnits('PRT', this.tags);
