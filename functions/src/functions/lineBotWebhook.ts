@@ -19,10 +19,31 @@ const client = new line.Client(config);
 
 function handleEvent(event) {
   console.log(event);
-  let message = 'Please push text message.';
+  let message;
 
   if (event.type === 'message' && event.message.type === 'text') {
-    message = event.message.text;
+      //message = event.message.text;
+      const userId = event.source.userId;
+      return client.getProfile(userId)
+          .then((profile) => {
+              console.log(userId);
+              console.log(profile.displayName);
+              console.log(profile.pictureUrl);
+              console.log(profile.statusMessage);
+              return firebase.db
+                  .collection('line_users')
+                  .doc(userId)
+                  .update({
+                      name: profile.displayName,
+                  })
+          })
+          .catch((err) => {
+              console.error(err);
+          });
+  } 
+
+  if (event.type === 'join') {
+    message = "みなさんのブログ管理をサポートするかんなちゃんだお！ズル剥けコンサルタントとイキリ帰国子女は特によろしくね❤️";
   }
 
   return client.replyMessage(event.replyToken, { type: "text", text: message });
