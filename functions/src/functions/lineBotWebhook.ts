@@ -33,7 +33,7 @@ function handleEvent(event) {
               return firebase.db
                   .collection('line_users')
                   .doc(userId)
-                  .update({
+                  .set({
                       name: profile.displayName,
                   })
           })

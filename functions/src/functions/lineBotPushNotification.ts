@@ -29,13 +29,13 @@ export default firebase.functions
 
         const commitMessage = req.body.head_commit.message;
         const pusher = req.body.pusher.name;
-        let commiter = '無名';
+        let committer = '無名';
         if (pusher === 'seita-uc') {
-            commiter = 'イケイケエンジニア様';
+            committer = 'イケイケエンジニア様';
         } else if (pusher === 'Noiseshunk') {
-            commiter = 'ズル剥けコンサルタント';
+            committer = 'ズル剥けコンサルタント';
         } else if (pusher === 'knose24') {
-            commiter = 'イキリ帰国子女';
+            committer = 'イキリ帰国子女';
         } 
 
         let additionalMessage;
@@ -49,11 +49,11 @@ export default firebase.functions
                 additionalMessage = "このくらいで満足するなよ？❤️";
                 break;
             case 2:
-                additionalMessage = `${commiter}大好き！！！！`;
+                additionalMessage = `${committer}大好き！！！！`;
                 break;
         }
 
-        const message = `${commiter}が${commitMessage}をコミットしてくれたみたい！${additionalMessage}`;
+        const message = `${committer}が${commitMessage}をコミットしてくれたみたい！${additionalMessage}`;
         return client.pushMessage(groupId, {
             type: 'text',
             text: message,
