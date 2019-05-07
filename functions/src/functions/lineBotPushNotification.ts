@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const client = new line.Client(config);
-const groupId = "Rbc2f4675368f47385fb4663a8129076e";
+const groupId = "Cd13e05dcea9ea75ed2ffcd05f99e0b11";
 
 export default firebase.functions
     .https.onRequest(async (req, res) => {
