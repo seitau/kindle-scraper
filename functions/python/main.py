@@ -19,7 +19,7 @@ def parse_morpheme(request):
 
         if request_json and 'text' in request_json:
             downloader.download("morph2.en")     
-            text = request_json['text']
+            text = request_json['text'].replace(" ", "")
             parsedText = Text(text)
             parsedText.language = "en"
             response.set_data(json.dumps({ "result": parsedText.morphemes }))

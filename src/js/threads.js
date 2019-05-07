@@ -31,7 +31,7 @@ export default class Threads {
                 xspacing: 7,
                 angularVelocity: 0.04,
                 amplitude: 125 + this.accumDelta,
-                yaxis: p5.windowHeight/3,
+                yaxis: p5.baseHeight,
             }
             const thread = new Thread(p5, param);
             this.threads.push(thread);

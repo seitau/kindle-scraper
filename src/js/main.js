@@ -6,7 +6,7 @@ const userId = '2cb0e03eef321c467dfa07b70bda2fdada09696253cc5f9d590753bf1aa9dc1f
 
 const sketch = function(p5) {
     p5.halfWindowWidth = p5.windowWidth/2;
-    p5.baseHeight = p5.windowHeight/3;
+    p5.baseHeight = p5.windowHeight/3.5;
     p5.showMessage = function(message) {
         this.background(0)
         this.fill('yellow');
@@ -68,7 +68,7 @@ const sketch = function(p5) {
         //const scrape = p5.createInput('scrape!!');
         doms['slide'] = {
             elem: slide,
-            offset: 240,
+            offset: 300,
         };
         //doms['email'] = {
         //elem: email,
@@ -142,8 +142,6 @@ const sketch = function(p5) {
 
     p5.windowResized = function() {
         p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-        p5.halfWindowWidth = p5.windowWidth/2;
-        p5.baseHeight = p5.windowHeight/3;
         for (const [ propName, dom ] of Object.entries(doms)) {
             dom.elem.position(p5.halfWindowWidth, p5.baseHeight + dom.offset);
             dom.elem.center('horizontal');
