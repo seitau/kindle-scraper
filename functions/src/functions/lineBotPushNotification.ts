@@ -20,8 +20,10 @@ const groupId = "Rbc2f4675368f47385fb4663a8129076e";
 
 export default firebase.functions
     .https.onRequest(async (req, res) => {
-        if (Object.keys(req.body).length === 0) {
-            return res.status(200).send(`Success: empty request`)
+        const body = req.body;
+        if (!body.hasOwnProperty('pusher') ||
+            !body.hasOwnProperty('head_commit')) {
+            return res.status(200).send(`Success: test request`)
         }
         console.log(req.body);
 
