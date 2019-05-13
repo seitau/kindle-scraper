@@ -1,6 +1,6 @@
 import firebase from '../common/firebase';
 import * as line from '@line/bot-sdk';
-import rp from 'request-promise';
+import * as rp from 'request-promise';
 
 let config;
 let recruitApiKey;
@@ -27,30 +27,31 @@ function handleEvent(event) {
 
   if (event.type === 'message' && event.message.type === 'text') {
       message = event.message.text;
-      const userId = event.source.userId;
-      if(message.includes("かんなちゃん") || message.includes("カンナちゃん")) {
+      //const userId = event.source.userId;
+      if(message.includes('かんなちゃん')) {
           const options = {
               method: 'POST',
               uri: 'https://api.a3rt.recruit-tech.co.jp/talk/v1/smalltalk',
               form: {
                   apikey: recruitApiKey,
-                  query: message
+                  query: message.replace('かんなちゃん', ''),
               },
           };
           return rp(options)
               .then((response) => {
                   const res = JSON.parse(response);
-                  console.log(res.results[0].reply)
+                  console.log(res.results[0].reply);
                   return client.replyMessage(event.replyToken, { 
                       type: "text", 
                       text: res.results[0].reply
                   });
               })
               .catch((err) => {
-                  return console.error(err)
+                  console.error(err);
+                  return err;
               });
       }
-      return
+      return;
   } 
 
   if (event.type === 'join') {
