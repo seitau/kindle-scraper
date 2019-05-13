@@ -24,12 +24,20 @@ export default firebase.functions
         console.log(req.body);
         const body = req.body;
         let message;
-        if(body.id === 'google-analytics') {
-            message = getAnalyticsReport(body);
-        } else if(body.id === 'google-adsense') {
-            message = getAdSenseReport(body);
-        } else {
-            message = makeCommitReport(body);
+        try {
+            if(body.id === 'google-analytics') {
+                message = await getAnalyticsReport(body);
+            } else if(body.id === 'google-adsense') {
+                message = await getAdSenseReport(body);
+            } else {
+                if (!body.hasOwnProperty('pusher') ||
+                    !body.hasOwnProperty('head_commit')) {
+                    return res.status(200).send(`Success: test request`)
+                }
+                message = makeCommitReport(body);
+            }
+        } catch(err) {
+            return res.status(400).send(`Error: ${err.toString()}`);
         }
 
         return client.pushMessage(groupId, {
@@ -45,10 +53,6 @@ export default firebase.functions
     });
 
 function makeCommitReport(body) {
-    if (!body.hasOwnProperty('pusher') ||
-        !body.hasOwnProperty('head_commit')) {
-        return res.status(200).send(`Success: test request`)
-    }
     const commitMessage = body.head_commit.message;
     const pusher = body.pusher.name;
     let committer = '無名';
@@ -76,7 +80,7 @@ function makeCommitReport(body) {
     return message + additionalMessage;
 }
 
-fuction getAnalyticsReport(body) {
+function getAnalyticsReport(body) {
     const options = {
         method: 'GET',
         uri: 'https://kanna-google-report.herokuapp.com/googleAnalyticsReport',
@@ -104,7 +108,7 @@ fuction getAnalyticsReport(body) {
         });
 }
 
-fuction getAdSenseReport(body) {
+function getAdSenseReport(body) {
     const options = {
         method: 'GET',
         uri: 'https://kanna-google-report.herokuapp.com/googleAdSenseReport',
