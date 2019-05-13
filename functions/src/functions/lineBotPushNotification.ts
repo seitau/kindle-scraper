@@ -30,28 +30,26 @@ export default firebase.functions
         const commitMessage = req.body.head_commit.message;
         const pusher = req.body.pusher.name;
         let committer = '無名';
+        let name = '無名';
         if (pusher === 'seita-uc') {
             committer = 'イケイケエンジニア様';
+            name = 'せいた';
         } else if (pusher === 'Noiseshunk') {
             committer = 'ズル剥けコンサルタント';
+            name = 'しんのすけ';
         } else if (pusher === 'knose24') {
             committer = 'イキリ帰国子女';
+            name = 'かずと';
         } 
 
-        let additionalMessage;
-        const num = Date.now() % 3;
-        console.log(num);
-        switch(num) {
-            case 0:
-                additionalMessage = "もっともっと頑張ってね！❤️";
-                break;
-            case 1:
-                additionalMessage = "このくらいで満足するなよ？❤️";
-                break;
-            case 2:
-                additionalMessage = `${committer}大好き！！！！`;
-                break;
-        }
+        const messages = [
+            "もっともっと頑張ってね！❤️",
+            "このくらいで満足するなよ？❤️",
+            `${committer}大好き！！！！`,
+            `${name}${name}${name}${name}`,
+            `${name}ならできると思ってた！`,
+        ]
+        const additionalMessage = messages[Date.now() % messages.length];
 
         const message = `${committer}が${commitMessage}をコミットしてくれたみたい！${additionalMessage}`;
         return client.pushMessage(groupId, {
@@ -64,4 +62,4 @@ export default firebase.functions
             .catch((err) => {
                 return res.status(400).send(`Error: ${err.toString()}`);
             });
-});
+    });
