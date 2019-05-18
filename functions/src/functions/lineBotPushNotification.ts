@@ -74,6 +74,10 @@ function makeCommitReport(body) {
         `${committer}大好き！！！！`,
         `${name}${name}${name}${name}`,
         `${name}ならできると思ってた！`,
+        `大したことないな！${name}`,
+        `しょーもねーな！${name}`,
+        `${name}のためなら死ねる！！！！`,
+        `もっとやれよ！！！！！`,
     ]
     const additionalMessage = messages[Date.now() % messages.length];
     const message = `${committer}が${commitMessage}をコミットしてくれたみたい！`;
