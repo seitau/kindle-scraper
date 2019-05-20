@@ -68,6 +68,9 @@ function makeCommitReport(body) {
     } else if (pusher === 'knose24') {
         committer = 'イキリ帰国子女';
         name = 'かずと';
+    } else if (pusher === 'minaminamina53') {
+        committer = 'みなたん';
+        name = 'みな';
     } 
 
     const messages = [
@@ -76,7 +79,7 @@ function makeCommitReport(body) {
         `${committer}大好き！！！！`,
         `${name}${name}${name}${name}`,
         `${name}ならできると思ってた！`,
-        `${name}は大したことねぇな！`,
+        `${name}たん大したことねぇな！`,
         `しょーもねーな！${name}よぉ！！`,
         `${name}のためなら死ねる！！！！`,
         `もっとやれよ！！！！！`,
