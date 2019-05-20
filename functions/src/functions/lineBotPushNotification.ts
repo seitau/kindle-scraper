@@ -74,8 +74,8 @@ function makeCommitReport(body) {
         `${committer}大好き！！！！`,
         `${name}${name}${name}${name}`,
         `${name}ならできると思ってた！`,
-        `大したことないな！${name}`,
-        `しょーもねーな！${name}`,
+        `${name}は大したことねぇな！`,
+        `しょーもねーな！${name}よぉ！！`,
         `${name}のためなら死ねる！！！！`,
         `もっとやれよ！！！！！`,
     ]
