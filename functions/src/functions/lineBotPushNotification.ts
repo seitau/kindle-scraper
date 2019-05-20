@@ -29,6 +29,8 @@ export default firebase.functions
                 message = await getAnalyticsReport(body);
             } else if(body.id === 'google-adsense') {
                 message = await getAdSenseReport(body);
+            } else if(body.id === 'google-analytics-pageview') {
+                message = await getAnalyticsPageViewReport(body);
             } else {
                 if (!body.hasOwnProperty('pusher') ||
                     !body.hasOwnProperty('head_commit')) {
@@ -93,7 +95,7 @@ function getAnalyticsReport(body) {
     return rp(options)
         .then((response) => {
             const res = JSON.parse(response);
-            let message = '今週の地域別閲覧数です！\n\n';
+            let message = '今週の地域別閲覧数トップ10です！\n\n';
             let i = 0;
             for(const country in res) {
                 if(i >= 10) {
@@ -105,6 +107,34 @@ function getAnalyticsReport(body) {
             }
             console.log(message);
             return message; 
+        })
+        .catch((err) => {
+            console.error(err);
+            return err;
+        });
+}
+
+function getAnalyticsPageViewReport(body) {
+    const options = {
+        method: 'GET',
+        uri: 'https://kanna-google-report.herokuapp.com/googleAnalyticsPageViewReport',
+    };
+
+    return rp(options)
+        .then((response) => {
+            const res = JSON.parse(response);
+            let message = '今週のページ別閲覧数トップ10です！\n\n';
+            let i = 0;
+            for(const pageTitle in res) {
+                if(i >= 10) {
+                    break;
+                }
+                const str = `${i+1}: ${pageTitle} ${res[pageTitle]} views \n`;
+                message += str;
+                i++;
+            }
+            console.log(message);
+            return message;
         })
         .catch((err) => {
             console.error(err);
