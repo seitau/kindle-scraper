@@ -28,13 +28,13 @@ function handleEvent(event) {
   if (event.type === 'message' && event.message.type === 'text') {
       message = event.message.text;
       //const userId = event.source.userId;
-      if(message.includes('かんなちゃん')) {
+      if(message.includes('とうりくん')) {
           const options = {
               method: 'POST',
               uri: 'https://api.a3rt.recruit-tech.co.jp/talk/v1/smalltalk',
               form: {
                   apikey: recruitApiKey,
-                  query: message.replace('かんなちゃん', ''),
+                  query: message.replace('とうりくん', ''),
               },
           };
           return rp(options)
@@ -55,7 +55,7 @@ function handleEvent(event) {
   } 
 
   if (event.type === 'join') {
-    message = "みなさんのブログ管理をサポートするかんなちゃんだお！ズル剥けコンサルタントとイキリ帰国子女は特によろしくね❤️";
+    message = "みなさんのブログ管理をサポートする松坂桃李です。どうぞよろしくね!";
   }
 
   return client.replyMessage(event.replyToken, { type: "text", text: message });

@@ -17,7 +17,9 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const client = new line.Client(config);
-const groupId = "Cd13e05dcea9ea75ed2ffcd05f99e0b11";
+const seitaId = "Ua63321b405c49b05fa0769a72097c355";
+const groupId1 = "Cd13e05dcea9ea75ed2ffcd05f99e0b11";
+const groupId2 = "C2676e4daeb5d96586d923bbabcdd4926";
 
 export default firebase.functions
     .https.onRequest(async (req, res) => {
@@ -37,15 +39,32 @@ export default firebase.functions
                     return res.status(200).send(`Success: test request`)
                 }
                 message = makeCommitReport(body);
+                return client.pushMessage(seitaId, {
+                    type: 'text',
+                    text: message,
+                })
+                    .then(() => {
+                        return res.status(200).send(`Success: ${message}`)
+                    })
             }
         } catch(err) {
             return res.status(400).send(`Error: ${err.toString()}`);
         }
 
-        return client.pushMessage(groupId, {
-            type: 'text',
-            text: message,
+        console.log(message)
+
+        return client.pushMessage(groupId1, {
+            type: 'flex',
+            altText: 'report',
+            contents: message,
         })
+            .then(() => {
+                return client.pushMessage(groupId2, {
+                    type: 'flex',
+                    altText: 'report',
+                    contents: message,
+                })
+            })
             .then(() => {
                 return res.status(200).send(`Success: ${message}`)
             })
@@ -60,32 +79,33 @@ function makeCommitReport(body) {
     let committer = '無名';
     let name = '無名';
     if (pusher === 'seita-uc') {
-        committer = 'イケイケエンジニア様';
+        committer = 'せいたくん';
         name = 'せいた';
     } else if (pusher === 'Noiseshunk') {
-        committer = 'ズル剥けコンサルタント';
+        committer = 'いけいけコンサルタント';
         name = 'しんのすけ';
     } else if (pusher === 'knose24') {
-        committer = 'イキリ帰国子女';
+        committer = '筋トレ帰国子女';
         name = 'かずと';
     } else if (pusher === 'minaminamina53') {
         committer = 'みなたん';
         name = 'みな';
+    } else if (pusher === 'riko-m') {
+        committer = 'りこちゃん';
+        name = 'りこ';
+    } else if (pusher === 'Himadayooo') {
+        committer = 'ひまわりちゃん';
+        name = 'ひまわり';
     } 
 
     const messages = [
-        "もっともっと頑張ってね！❤️",
-        "このくらいで満足するなよ？❤️",
-        `${committer}大好き！！！！`,
-        `${name}${name}${name}${name}`,
-        `${name}ならできると思ってた！`,
-        `${name}たん大したことねぇな！`,
-        `しょーもねーな！${name}よぉ！！`,
-        `${name}のためなら死ねる！！！！`,
-        `もっとやれよ！！！！！`,
+        "もっともっと頑張ってね!",
+        `${committer}ありがとう!`,
+        `${name}いいかんじ!`,
+        `${name}この調子!`,
     ]
     const additionalMessage = messages[Date.now() % messages.length];
-    const message = `${committer}が${commitMessage}をコミットしてくれたみたい！`;
+    const message = `${committer}が${commitMessage}をコミットしてくれたみたいだね！`;
     return message + additionalMessage;
 }
 
@@ -98,18 +118,21 @@ function getAnalyticsReport(body) {
     return rp(options)
         .then((response) => {
             const res = JSON.parse(response);
-            let message = '今週の地域別閲覧数トップ10です！\n\n';
+            const subtitle = 'Google Analytics';
+            const title = '今週の地域別閲覧数トップ10';
+            let flexMessage = makeFlexMessageWithoutImage(subtitle, title)
             let i = 0;
             for(const country in res) {
                 if(i >= 10) {
                     break;
                 }
                 const str = `${i+1}: ${country} ${res[country]} views \n`;
-                message += str;
+                flexMessage = addContent(flexMessage, `${i+1}: ${country}`, "sm",  res[country], 'views');
                 i++;
             }
-            console.log(message);
-            return message; 
+            console.log(flexMessage);
+            return flexMessage;
+
         })
         .catch((err) => {
             console.error(err);
@@ -126,18 +149,19 @@ function getAnalyticsPageViewReport(body) {
     return rp(options)
         .then((response) => {
             const res = JSON.parse(response);
-            let message = '今週のページ別閲覧数トップ10です！\n\n';
+            const subtitle = "Google Analytics"
+            const title = '今週のページ別閲覧数トップ10';
+            let flexMessage = makeFlexMessageWithoutImage(subtitle, title)
             let i = 0;
             for(const pageTitle in res) {
                 if(i >= 10) {
                     break;
                 }
-                const str = `${i+1}: ${pageTitle} ${res[pageTitle]} views \n`;
-                message += str;
+                flexMessage = addContent(flexMessage, `${i+1}: ${pageTitle}`, "xs", res[pageTitle], "views")
                 i++;
             }
-            console.log(message);
-            return message;
+            console.log(flexMessage);
+            return flexMessage;
         })
         .catch((err) => {
             console.error(err);
@@ -154,18 +178,123 @@ function getAdSenseReport(body) {
     return rp(options)
         .then((response) => {
             const res = JSON.parse(response);
-            let message = '今週の日別収益です! \n\n';
+            const subtitle = 'Google AdSense';
+            const title = '今週の日別収益';
+            let flexMessage = makeFlexMessageWithoutImage(subtitle, title)
+
             for(const date in res.earnings) {
-                const str = `${date}: ${res.earnings[date]} yen \n`;
-                message += str;
+                flexMessage = addContent(flexMessage, date, "sm", res.earnings[date], 'yen');
             }
-            message += `total: ${res.total} yen \n`;
-            console.log(message);
-            return message; 
+            flexMessage = addTotal(flexMessage, res.total, 'yen')
+            console.log(flexMessage);
+            return flexMessage; 
         })
         .catch((err) => {
             console.error(err);
             return err;
         });
+}
+
+function makeFlexMessageWithoutImage(subtitle, title) {
+    const flexMessage = {
+        type: "bubble",
+        styles: {
+            footer: {
+                separator: true
+            }
+        },
+        body: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+                {
+                    type: "text",
+                    text: subtitle,
+                    weight: "bold",
+                    color: "#1DB446",
+                    size: "sm"
+                },
+                {
+                    type: "text",
+                    text: title,
+                    weight: "bold",
+                    size: "md",
+                    margin: "md"
+                },
+                {
+                    type: "separator",
+                    margin: "xxl"
+                },
+                {
+                    type: "box",
+                    layout: "vertical",
+                    margin: "lg",
+                    spacing: "xs",
+                    contents: [],
+                },
+            ]
+        }
+    }
+
+    return flexMessage;
+}
+
+function addContent(flexMessage, title, size, view, unit) {
+    const contents = [
+        {
+            type: "text",
+                text: title,
+                size: size,
+                color: "#555555",
+                flex: 0
+        },
+        {
+            type: "text",
+            text: `${view} ${unit}`,
+            size: size,
+            color: "#111111",
+            align: "end"
+        }
+    ];
+
+    for(let i = 0; i < contents.length; i++ ) {
+        flexMessage.body.contents[3].contents.push(contents[i])
+    }
+
+    return flexMessage;
+}
+
+function addTotal(flexMessage, view, unit) {
+    const contents = [
+        {
+            type: "separator",
+            margin: "xxl"
+        },
+        {
+            type: "box",
+            layout: "horizontal",
+            contents: [
+                {
+                    type: "text",
+                    text: "TOTAL",
+                    size: "sm",
+                    color: "#555555"
+                },
+                {
+                    type: "text",
+                    text: `${view} ${unit}`,
+                    size: "sm",
+                    color: "#111111",
+                    align: "end"
+                }
+            ]
+        },
+    ];
+
+    for(let i = 0; i < contents.length; i++ ) {
+        flexMessage.body.contents[3].contents.push(contents[i])
+    }
+
+    return flexMessage;
 }
 
