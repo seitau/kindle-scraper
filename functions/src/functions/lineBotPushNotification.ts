@@ -23,7 +23,6 @@ const groupId2 = "C2676e4daeb5d96586d923bbabcdd4926";
 
 export default firebase.functions
     .https.onRequest(async (req, res) => {
-        console.log(req.body);
         const body = req.body;
         let message;
         try {
