@@ -13,7 +13,7 @@
     "dependencies": {
         "@firebase/app": "^0.3.11",
         "@firebase/firestore": "^1.0.6",
-        "axios": "^0.18.0",
+        "axios": "^0.21.1",
         "babel-polyfill": "^6.26.0",
         "chart.js": "^2.7.3",
         "d3": "^5.9.1",
