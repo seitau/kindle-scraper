@@ -8,7 +8,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.1
 Morfessor==2.0.4
-numpy==1.16.2
+numpy==1.22.0
 pipreqs==0.4.9
 polyglot==16.7.4
 pycld2==0.31
